@@ -1,0 +1,9 @@
+<div class="defaultformdiv">
+    <form method="post" class="defaultform" action="{{ formtarget|default:"." }}" enctype="multipart/form-data"{%if formid %} id="{{ formid }}" {% endif %}>
+        <table>
+            {{ form }}
+        </table>
+        {% csrf_token %}
+        <input type="submit" class="button" value="{{ title|default:"Save" }}">
+    </form>
+</div>

@@ -1,0 +1,37 @@
+{% extends "users/base.html" %}
+
+{% block title %}Your favorite presets{% endblock %}
+
+{% block main %}
+<div>
+
+    <table id="favorites" class="list">
+        <thead>
+            <tr>
+                <th>Preset</th>
+                <th>Game</th>
+                <th>Creator</th>
+                <th>Added</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for presetfav in object_list %}
+            <tr>
+                <td>{{ presetfav.preset.render }}</td>
+                <td>{{ presetfav.preset.game.render }}</td>
+                <td>{{ presetfav.preset.creator.get_profile.render }}</td>
+                <td>{{ presetfav.added }}</td>
+                <td>
+                    <form method="post" action="{% url user-rmfav %}">
+                        <input type="hidden" name="preset" value="{{ presetfav.preset.id }}">
+                        <input type="submit" value="Remove">
+                        {% csrf_token %}
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "authopenid/base.html" %}
+
+{% block main %}
+complete
+
+<h2>New user</h2>
+{% include "shared/form.html" with form=form1%}
+<h2>Existing user</h2>
+{% include "shared/form.html" with form=form2%}
+{% endblock %}

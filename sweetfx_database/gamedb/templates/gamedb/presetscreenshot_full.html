@@ -1,0 +1,42 @@
+{% extends "gamedb/base_gamedb.html" %}
+
+{% block title %}{{ object }}{% endblock %}
+
+{% block page %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url g-games-list %}">Games list</a></li>
+        <li>{{ object.preset.game.render }}</li>
+        <li>{{ object.preset.render }}</li>
+        <li><a href="{{ object.get_absolute_url }}">{{ object }}</a></li>
+        <li>Full size</li>
+    </ul>
+</div>
+<div id="presetscreenshotdetail">
+    <div id="screenshot_full">
+            <img src="{{ object.image.url }}" class="imgscreen"/>
+            {% if object.comparison_image %}
+                <div class="comparecontainer" style="display:hidden">
+                    <img src="{{ object.comparison_image.url }}" class="shotcompare"/>
+                </div>
+            {% endif %}
+    </div>
+    <script>
+        $(window).load(function () {
+            var cc = $(".comparecontainer");
+            var image = $(".imgscreen").offset();
+            cc.css( {
+                "position": "absolute",
+                "top" : image.top,
+                "left": image.left,
+                "display": "block",
+            });
+
+            $("#screenshot_full").mousemove(function (e) {
+                cc.css("width", e.pageX - image.left);
+            });
+
+        });
+    </script>
+</div>
+{% endblock %}

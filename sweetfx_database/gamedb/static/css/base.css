@@ -1,0 +1,30 @@
+.box {
+border: 1px solid #333;
+border-radius: 10px;
+padding: 6px;
+margin-top: 5px;
+}
+
+#latestposts .entry {
+padding: 3px;
+}
+
+#latestposts .updated {
+font-size: x-small;
+padding-left: 3px;
+}
+
+#latestposts .updatedby {
+font-size: small;
+padding-left: 3px;
+}
+
+#latestposts {
+margin-top: 20px;
+}
+
+#rightside {
+float: right;
+width: 145px;
+padding: 5px;
+}

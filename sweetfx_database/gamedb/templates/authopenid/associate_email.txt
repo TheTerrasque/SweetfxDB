@@ -1,0 +1,4 @@
+Your account {{ user.username }} on {{ site.name }}
+is now connected to your OpenID!
+
+You can now use OpenID to log in to the site :)

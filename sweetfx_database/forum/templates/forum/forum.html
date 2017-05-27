@@ -1,0 +1,35 @@
+{% extends "forum/base.html" %}
+{% load cache %}
+
+{% block main %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url forum-main %}">Forums</a></li>
+        <li>{{ forum.render }}</li>
+    </ul>
+</div>
+    <table class="forumtable list">
+        <thead>
+            <tr>
+                <td>Title</td>
+                <td>Creator</td>
+                <td>Posts</td>
+                <td>Last post</td>
+                <td>By</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for thread in forum.forumthread_set.all %}
+            <tr>
+                <td><a href="{{ thread.get_absolute_url }}">{{ thread.title }}</a></td>
+                <td>{% cache 600 userlink thread.creator_id %}{% include "shared/user.html" with user=thread.creator %}{% endcache %}</td>
+                <td>{{ thread.posts }}</td>
+                <td>{{ thread.updated|timesince }} ago</td>
+                <td>{% if thread.last_post %}{% cache 600 userlink thread.last_post.creator_id %}{% include "shared/user.html" with user=thread.last_post.creator %}{% endcache %}{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+<div id="newthreadlink"><a href="{% url forum-new-thread forum.slug %}">New thread</a></div>
+{% endblock %}

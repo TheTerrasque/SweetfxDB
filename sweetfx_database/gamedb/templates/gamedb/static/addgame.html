@@ -1,0 +1,36 @@
+{% extends "gamedb/base_gamedb.html" %}
+
+{% block title %}How to add a preset{% endblock %}
+
+{% block main %}
+    <div id="breads">
+        <ul class="horizmenu">
+            <li><a href="{% url g-games-list %}">Games list</a></li>
+            <li><a href="{% url g-show-template "addgame" %}">Adding a preset</a></li>
+        </ul>
+    </div>
+   <h2>Adding a new preset</h2>
+
+    <p>First of all, adding a game, adding a preset,
+    and adding a screenshot are three separate tasks.</p>
+
+    <p>When adding a preset, first thing you should do is look at the game list,
+     and see if the game you want to add a preset to is already listed. If it is,
+     click on it, and go to the "Adding a Preset" section</p>
+
+<h3>1. Adding a game</h3>
+    <p>If the game already is in the list, there's no need to add it a second time</p>
+    <p>If the game is not already in the list, you first need to add it to the list. Click on the "Add a game to the list" button at the bottom of the list.</p>
+    {% include "gamedb/static/part/newgame.html" %}
+
+<h3>2. Adding a preset</h3>
+    <p>Now that the game is in the list, you can select that, and press "Add a preset"</p>
+    <p>You can then input the preset name, which SweetFX version it's for, and the settings text!</p>
+    <p>Clicking save on that will send you to the newly created preset, and you can finally start adding screenshots!</p>
+
+<h3>3. Add a screenshot</h3>
+    <p>When you're on a preset you created, you have a button called "Add new screenshot"!</p>
+    <p>Clicking that will lead you to a form where you can select the image to upload, what state SweetFX is in that image, and if you want, a description and comparison image.</p>
+    <p>If you add a comparison image, it should be as similar as the other image, but with SweetFX turned off. The images will be overlaid each other, and the user can easily switch from one to the other</p>
+
+{% endblock %}

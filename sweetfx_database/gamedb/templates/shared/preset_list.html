@@ -1,0 +1,31 @@
+  <div id="gamepresets">
+        <h3>Game presets</h3>
+        <table class="list">
+            <tr>
+                <th>Preset</th>
+                {% if not hidegame %}
+                    <th>Game</th>
+                {% endif %}
+                <th>Added</th>
+                <th>By</th>
+                <th>Screenshots</th>
+                <th>Downloads</th>
+                <th>Shader</th>
+            </tr>
+        {% for preset in presets %}
+        {% if preset.is_active %}
+            <tr>
+                <td>{{ preset.render }}</td>
+                {% if not hidegame %}
+                    <td>{{ preset.game.render }}</td>
+                {% endif %}
+                <td>{{ preset.added }}</td>
+                <td>{% include "shared/user.html" with user=preset.creator %}</td>
+                <td>{{ preset.screenshot_count }}</td>
+                <td>{{ preset.downloads }}</td>
+                <td>{{ preset.shader.render }}</td>
+            </tr>
+        {% endif %}
+        {% endfor %}
+        </table>
+    </div>

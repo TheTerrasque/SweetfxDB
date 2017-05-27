@@ -1,0 +1,84 @@
+{% extends "gamedb/base_gamedb.html" %}
+{% load bbcode %}
+{% block title %}{{ object }}{% endblock %}
+
+{% block main %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url g-games-list %}">Games list</a></li>
+        <li>{{ object.preset.game.render }}</li>
+        <li>{{ object.preset.render }}</li>
+        <li><a href="{{ object.get_absolute_url }}">{{ object }}</a></li>
+    </ul>
+</div>
+<div id="presetscreenshotdetail">
+    {% include "shared/editlink.html" with urlid="g-screenshot-edit" name="screenshot" %}
+    <h2>Screenshot for {{ object.preset.game.render }}</h2>
+    <h3>Preset : {{ object.preset.render }}</h3>
+    <div id="infobox">
+        <div class="infoline">Added {{ object.created }} by {% include "shared/user.html" with user=object.creator %}</div>
+        <div class="infoline">Original size : {{ object.image_width }}x{{ object.image_height }}</div>
+        <div class="infoline">SweetFX state : {{ object.get_sweetfx_state_display }}</div>
+    </div>
+    {% if object.description %}<div id="screenshotinfo">{{ object.description|bbcode }}</div>{% endif %}
+    <div id="screenshot">
+        <a href="{% url g-screenshot-full object.id %}">
+            <img src="{{ object.medium_thumb.url }}" class="imgscreen"/>
+
+            {% if object.comparison_image %}
+                <span id="sfxon" class="sfxstat">SweetFX ON</span>
+                <div class="comparecontainer" style="display:hidden">
+                    <img src="{{ object.medium_thumb_compared.url }}" class="shotcompare"/>
+                    <span id="sfxoff" class="sfxstat">SweetFX OFF</span>
+                </div>
+            {% endif %}
+        </a>
+    </div>
+    <p>Click the image for full resolution</p>
+    {% include "shared/comments.html" %}
+    <script>
+        $(window).load(function () {
+            var sfxon = $("#sfxon");
+            var sfxoff = $("#sfxoff");
+
+            var cc = $(".comparecontainer");
+            var iw = $(".imgscreen").width();
+            var ih = $(".imgscreen").height();
+            var image = $(".imgscreen").offset();
+
+            cc.css( {
+                "position": "absolute",
+                "top" : image.top,
+                "left": image.left,
+                "display": "block",
+            });
+
+            sfxon.css( {
+                "position": "absolute",
+                "top" : image.top + ih - sfxon.outerHeight(),
+                "left": image.left + iw - sfxon.outerWidth(),
+                "display": "block",
+            });
+
+            sfxoff.css( {
+                "position": "absolute",
+                "top" : ih - sfxoff.outerHeight(),
+                "left": 0,
+                "display": "block",
+            });
+
+            $("#screenshot").mouseleave(function() {
+                $(".sfxstat").fadeIn(400);
+            });
+
+            $("#screenshot").mouseenter(function() {
+                $(".sfxstat").fadeOut(300);
+            });
+
+            $("#screenshot").mousemove(function (e) {
+                cc.css("width", e.pageX - image.left);
+            });
+        });
+    </script>
+</div>
+{% endblock %}

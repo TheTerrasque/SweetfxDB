@@ -1,0 +1,48 @@
+{% extends "forum/base.html" %}
+{% load bbcode %}
+{% load cache %}
+
+{% block main %}
+<div id="forumposts">
+    
+    <div id="breads">
+        <ul class="horizmenu">
+            <li><a href="{% url forum-main %}">Forums</a></li>
+            <li>{{ thread.forum.render }}</li>
+            <li>{{ thread.render }}</li>
+        </ul>
+    </div>
+
+    <div class="threadname">{{ thread.title }}</div>
+    {% for post in thread.forumpost_set.all %}
+        <div class="post">
+            <div class="header">
+                <div class="user">{% cache 600 userlink post.creator_id %}{% include "shared/user.html" with user=post.creator %}{% endcache %}</div>
+                <div class="created">Posted {{ post.created|timesince }} ago</div>
+                {% if post.is_edited %}
+                    <div class="edited">Edited {{ post.updated|timesince }} ago</div>
+                {% endif %}
+                {% ifequal post.creator user %}<div class="editpost"><a href="{% url forum-post-edit post.id %}">Edit post</a></div>{% endifequal %}
+            </div>
+            <div class="text">{{ post.text|bbcode }}</div>
+        </div>
+    {% endfor %}
+
+    <div class="newpost">
+        <div class="title">New post</div>
+        {% if user.is_authenticated %}
+            <div class="bbhelp">
+                {% include "inc/bbhelp.html" %}
+            </div>
+            <form method="post" action="{% url forum-thread-post thread.forum.slug thread.id %}" enctype="multipart/form-data"{%if formid %} id="{{ formid }}" {% endif %}>
+                <textarea name="text"></textarea>
+                {% csrf_token %}
+                <div><input type="submit" class="button" value="Submit new post"></div>
+            </form>
+        {% else %}
+            <p>Please <a href="/accounts/login/?next={{ request.path }}">log in</a> to post an answer</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

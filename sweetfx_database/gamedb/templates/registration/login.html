@@ -1,0 +1,9 @@
+{% extends "registration/base.html" %}
+
+{% block main %}
+{% with title="Log in" %}
+{% with formtarget=".?next="|add:next %}
+{% include "shared/form.html" %}
+ {% endwith %} {% endwith %}
+ <a href="{% url registration_register %}">New account</a>
+{% endblock %}

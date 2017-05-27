@@ -1,0 +1,33 @@
+{% extends "gamedb/base_gamedb.html" %}
+{% load bbcode %}
+{% block title %}{{ object }}{% endblock %}
+
+{% block main %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url g-games-list %}">Games list</a></li>
+        <li>{{ object.render }}</li>
+    </ul>
+</div>
+<div id="gamedetail">
+    {% include "shared/editlink.html" with urlid="g-game-edit" name="game" %}
+    <h2 id="gametitle">{{ object.title }}</h2>
+    <div id="infobox">
+        <div class="infoline">Entry created by {% include "shared/user.html" with user=object.creator %}</div>
+        <div class="infoline">Added {{ object.added }}</div>
+        {% if object.url %}<div class="infoline">Homepage : <a href="{{ object.url }}" target="_new">{{ object.url }}</a></div>{% endif %}
+    </div>
+    {% if object.sweetfx_notes %}
+    <div id="noteswrap">
+        <div id="notestitle">SweetFX game notes:</div>
+        <div id="notes">{{ object.sweetfx_notes|bbcode }}</div>
+    </div>
+    {% endif %}
+    {% include "shared/preset_list.html" with presets=object.get_presets hidegame=1 %}
+    <div class="buttoner">
+            <a href="{% url g-game-add-preset object.id %}" class="button">Add a preset</a>
+    </div>
+    {% include "shared/comments.html" %}
+</div>
+{% endblock %}
+

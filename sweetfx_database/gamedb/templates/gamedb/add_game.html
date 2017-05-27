@@ -1,0 +1,15 @@
+{% extends "gamedb/base_gamedb.html" %}
+
+{% block main %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url g-games-list %}">Games list</a></li>
+        <li>New game entry</li>
+    </ul>
+</div>
+ {% include "shared/form.html" %}
+ {% include "gamedb/static/part/newgame.html" %}
+  <div style="padding: 10px;" id="bbhelpwrap">
+ {% include "inc/bbhelp.html" %}
+ </div>
+{% endblock %}

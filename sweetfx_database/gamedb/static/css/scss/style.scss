@@ -1,0 +1,628 @@
+$color: #8CC1D3;
+$color: #9FC0CB;
+$color: #A0BAC8;
+
+$light2: lighten($color, 25%);
+$light3: lighten($color, 10%);
+$bgcolor: lighten($color, 28%);
+$light: lighten($color, 20%);
+$borders: darken($color, 30%);
+$borders2: darken($color, 10%);
+$link: darken($color, 50%);
+
+$sidebar: 150px;
+
+@import url(base.css);
+
+@import "forum";
+
+@import "blue";
+
+@mixin gradient($start: $light, $stop: $color) {
+    background-image: -webkit-linear-gradient(top, $start 0%, $stop 100%);
+    background-image: -o-linear-gradient(top, $start 0%, $stop 100%);
+    background-image: -moz-linear-gradient(top, $start 0%, $stop 100%);
+    background-image: -ie-linear-gradient(top, $start 0%, $stop 100%);
+    background-image: linear-gradient(top, $start 0%, $stop 100%);
+}
+p {
+    margin: 5px 0;
+}
+
+#latestposts {
+    margin-right: 10px;
+    margin-top: 20px;
+
+    .entry {
+        padding: 3px;
+    }
+
+    .updated {
+        font-size: x-small;
+        padding-left: 3px;
+    }
+
+    .updatedby {
+        font-size: small;
+        padding-left: 3px;
+    }
+}
+
+#adview {
+    float: right;
+}
+
+.searchdiv {
+    background-color: #fff;
+    border: 1px solid #000;
+    padding: 2px;
+    width: 140px;
+    box-shadow: 2px 2px 10px #555;
+
+    ul.sresults {
+        padding-left: 3px;
+       font-size: 80%;
+        li {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            border-top: 1px solid #999;
+        }
+    }
+}
+
+#logoblock {
+    float: left;
+    margin-top: -7px;
+    margin-left: -10px;
+    background-image: url("images/fancy.png");
+    height: 38px;
+    background-repeat: no-repeat;
+    padding-left: 46px;
+    background-position: left center;
+    #logotext {
+        color: #222;
+        padding-top: 7px;
+        text-shadow: 0px 2px 5px #444;
+        font-size: 130%;
+    }
+}
+
+@mixin button {
+    box-shadow: 2px 2px 6px rgba(50, 50, 50, 0.25);
+    @include gradient;
+    border: 1px solid $borders;
+    padding: 7px;
+    margin:4px;
+    border-radius: 10px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: $color;
+}
+div#gamepresets {
+    margin: 1em;
+    table {
+        margin: 1em;
+    }
+}
+
+a {
+    color: $link;
+
+    text-decoration:none;
+    &:hover {
+        color: lighten($link, 15%);
+        text-decoration: underline;
+    }
+}
+
+li.active {
+    font-size: 120%;
+    font-weight: bold;
+}
+
+#sidemenu {
+    float: left;
+    min-height: 13em;
+    width: $sidebar;
+    padding: 5px;
+    overflow: auto;
+    #isearch {
+        width: 100px;
+    }
+}
+
+div#top {
+    padding: 0.8em;
+    background-color: $light;
+    @include gradient;
+    border-bottom: 1px solid  $borders;
+    ul {
+        padding-top: 4px;
+       margin-left: 2em;
+       li  a{
+        padding: 10px;
+       }
+    }
+}
+table.list {
+    border-collapse: collapse;
+    margin-bottom: 5px;
+    td,th {
+        padding: 4px 7px;
+    }
+    tr:nth-child(even) {
+        background-color: $light;
+    }
+    tr:hover {
+        background-color: $light2;
+    }
+}
+
+ul.errorlist {
+    li {
+        color: #FF4A48;
+        list-style: none;
+    }
+}
+
+form table {
+    border-collapse: collapse;
+    margin-bottom: 5px;
+    td,th {
+        padding: 4px;
+    }
+    tr:first-child {
+        border: none;
+    }
+    tr {
+        border-top: 1px solid $color;
+    }
+}
+
+li {
+    margin-left: 30px;
+}
+
+.helptext {
+    font-style:italic;
+}
+
+.important {
+    color: #7A1616;
+}
+
+#randgame {
+    padding: 1em;
+}
+
+ul.list {
+    margin-left: 0;
+    padding-left: 0;
+    display: inline;
+    li {
+         margin-left: 0;
+        list-style: none;
+        padding-bottom: 2px;
+    }
+}
+ul.usermenu {
+    float: right;
+}
+
+ul.horizmenu {
+    margin-left: 0;
+    padding-left: 0;
+    display: inline-block;
+    li {
+         margin-left: 0;
+        padding: 3px 15px;
+        list-style: none;
+        display: inline;
+        a {
+
+        }
+    }
+}
+
+#paginator ul.pagination li {
+    padding: 3px;
+}
+
+#noteswrap {
+    padding: 3px;
+    #notes {
+        padding: 8px;
+        border: 1px solid $borders;
+        background-color: $light2;
+        border-radius: 11px;
+        display: inline-block;
+    }
+}
+
+.button {
+    @include button;
+    color: $link;
+    &:hover {
+        color: lighten($link, 15%);
+        text-decoration:none;
+    }
+}
+
+div#presettextwrapper {
+    border: 1px solid $borders;
+    margin: 1em;
+    padding: 0.6em;
+    background-color: $color;
+    width: 90%;
+    height: 60%;
+    div#presettextdata {
+        padding: 3px;
+        white-space: pre;
+        overflow:auto;
+        display: none;
+        height: 300px;
+        box-shadow: 1px 1px 8px #000;
+        border: 1px solid #000;
+        background-color: $light2;
+        font-family: Courier New, Lucida Console, monospace;
+    }
+}
+
+div#main {
+    padding: 1em;
+    margin-left: $sidebar + 4px;
+    margin-right: $sidebar + 4px;
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
+    background-color: $bgcolor;
+}
+
+#screenshots {
+    .link {
+        clear: both;
+    }
+}
+
+.presetimageblock {
+    float: left;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+    height: 210px;
+    width: 310px;
+    a {
+        display:inline-block;
+    }
+}
+
+$infoheight: 40px;
+.imagethumb {
+    box-shadow: 2px 2px 7px;
+    border: 2px solid #333;
+    overflow: hidden;
+    img {
+        display: block;
+        }
+    border-radius: 15px;
+    &:hover {
+        border: 2px solid #666;
+    }
+    .imageinfo {
+        height: $infoheight;
+        margin-top: $infoheight * -1;
+        .imagedetails {
+            background-color: rgba(191, 194, 190, 0.65);
+           width: 100%;
+           color: black;
+           display: none;
+           padding: 2px;
+           border-top: 1px solid #000;
+           border-bottom: 1px solid #000;
+        }
+        .imgsize {
+            float: right;
+            padding-right: 7px;
+        }
+        .added {
+           float: left;
+            padding-left: 7px;
+        }
+    }
+    &:hover .imagedetails {
+        display: inline-block;
+    }
+}
+
+#footer {
+    clear: both;
+}
+
+#infobox {
+    padding: 3px;
+    margin-left: 1em;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border: 1px solid $borders;
+    background-color: $light;
+    display: inline-block;
+    border-radius: 5px;
+    .infoline {
+        margin: 2px;
+    }
+}
+
+$sfxpad: 7px;
+.sfxstat {
+    background-color:  $bgcolor;
+    padding: 5px;
+    padding-top: $sfxpad;
+    font-size: 130%;
+    border-width: 0;
+    border-color: $borders;
+    border-style: solid;
+    border-top-width: 1px;
+}
+
+$borderrad: 7px;
+
+#sfxon {
+    padding-left: $sfxpad;
+    border-left-width: 1px;
+    border-top-left-radius: $borderrad;
+}
+#sfxoff {
+    padding-right: $sfxpad;
+    border-right-width:1px;
+    border-top-right-radius: $borderrad;
+}
+
+#presetscreenshotdetail {
+    #screenshot {
+        margin: 1em;
+    }
+}
+
+h3 {
+    margin: 5px;
+    margin-top: 8px;
+}
+
+#breads {
+    border-bottom: 1px solid $color;
+    padding-bottom: 3px;
+    margin-bottom: 4px;
+}
+
+input,textarea, select {
+    background-color: #eee;
+    border: 1px solid #aaa;
+    padding-left: 2px;
+    margin-left: 5px;
+}
+
+.formrequired input,.formrequired textarea, .formrequired select {
+    background-color: $light;
+    border: 1px solid #555;
+}
+
+div#editlink {
+    float: right;
+    margin-right: 1em;
+    a {
+        @include button;
+    }
+}
+div.buttoner {
+    padding-top: 10px;
+    margin-bottom: 14px;
+    margin-left: 1em;
+}
+
+#commentwrap {
+    padding-top: 2em;
+    clear: both;
+    p {
+        margin-top: 5px;
+    }
+    width: 700px;
+    #commentform {
+        width: 340px;
+        textarea {
+            width: 330px;
+            height: 100px;
+        }
+        padding: 15px;
+    }
+    #commentslist {
+    float: right;
+        width: 340px;
+        .comment {
+            margin: 7px;
+            border: 1px solid #222;
+            border-radius: 10px;
+            background-color: $light;
+            width: 330px;
+            margin-left: auto;
+            margin-right: auto;
+            @include gradient($bgcolor, $light);
+
+            box-shadow: 2px 2px 8px #555;
+            .commentcreator {
+                float: left;
+                padding: 5px;
+            }
+            .commentcreated {
+                float: right;
+                padding: 5px;
+            }
+            .commentcontent {
+                margin-top: 25px;
+                border-top: 1px solid #222;
+                padding: 5px;
+                overflow: auto;
+                width: 320px;
+            }
+        }
+    }
+}
+
+.comparecontainer {
+    display:none;
+    border-right: 3px solid fade-out(#1960D8, 0.7);
+    width: 400px;
+    overflow:hidden;
+}
+
+#breads {
+    a {
+        padding: 0;
+    }
+}
+
+.bold {
+    font-weight:bold;
+}
+
+.bb_preset,.bb_game {
+    background-color: $light3;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 5px;
+}
+
+.forumtable {
+    width: 90%;
+    border-collapse: collapse;
+    border: 1px solid $borders2;
+    thead {
+        background-color: $light;
+        font-weight: bold;
+    }
+    td {
+     border-bottom: 1px solid $borders2;
+     padding: 3px;
+    }
+    tr:nth-child(even) {
+     background-color: $light2;   
+    }
+}
+
+.bbtext {
+    white-space: pre-line;
+    line-height:1.4em;
+    word-spacing: 1px;
+    padding: 4px;
+    .bb_u {
+        text-decoration:underline;
+    }
+    .bb_b {
+        font-weight: bold;
+    }
+    .bb_i {
+        font-style:italic;
+    }
+    .bb_quote {
+        padding: 1em;
+        margin-left: 2em;
+        margin-right: 2em;
+        background-color: #fff;
+        border: 1px solid $color;
+        border-radius: 10px;
+    }
+}
+
+.bbhelp {
+    padding: 1em;
+    background-color: #fff;
+    border: 2px solid $color;
+    float: right;
+    width: 33%;
+    height: 10em;
+    overflow: auto;
+    margin-right: 1em;
+    border-radius: 15px;
+}
+
+.threadname {
+    font-weight: bold;
+    font-size: 110%;
+}
+#writepost {
+    padding: 3px;
+    margin-top: 1em;
+    border: 1px solid $borders;
+    background-color: $light;
+    .defaultform table {
+        width: 50%;
+    }
+    textarea {
+        width: 100%;
+        height: 10em;
+        padding: 5px;
+        margin: 4px;
+    }
+}
+.newpost {
+    padding: 3px;
+    margin-top: 1em;
+    border: 1px solid $borders;
+    background-color: $light;
+    textarea {
+        width: 50%;
+        height: 10em;
+        padding: 5px;
+        margin: 4px;
+    }
+}
+#forumposts {
+    .post {
+        border: 1px solid $borders;
+        .created {
+            font-size: 80%;
+        }
+        background-color: $light2;
+        margin-bottom: 4px;
+        .header {
+            background-color: $light;
+            div {
+                display: inline;
+            }
+            border-bottom: 1px solid $borders;
+        }
+        .text,.header {
+            padding: 4px;
+        }
+    }
+}
+
+.alerttext {
+    color: #FF2013;
+}
+
+#userdescription {
+    padding: 4px;
+    border: 1px solid #999;
+    margin: 10px;
+    border-radius: 10px;
+    background-color: #F1F1F1;
+    box-shadow: 4px 4px 15px #999;
+}
+
+.box {
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 6px;
+    margin-top: 5px;
+}
+
+#rightside {
+    float: right;
+    width: 145px;
+    padding: 5px;
+}

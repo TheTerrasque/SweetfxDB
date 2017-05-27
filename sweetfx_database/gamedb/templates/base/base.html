@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{%block title%}SweetFX Settings Database{% endblock %}</title>
+    {% if user.is_authenticated and user.get_profile.css %}
+        <link rel="stylesheet" href="{{ user.get_profile.css }}" />
+    {% else %}
+        <link rel="stylesheet" href="{{ CSSURL}}" />
+    {% endif %}
+    <link rel="shortcut icon" href="/static/logo.png" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    {%block head%}{% endblock %}
+</head>
+<body>
+    <div id="top">
+        <div id="logoblock">
+            <div id="logotext">SweetFX Settings DB</div>
+        </div>
+        <ul class="horizmenu">
+            <li>
+                <a href="{% url g-games-list %}">Games list</a>
+                <a href="{% url silly-home %}">Silly stuff</a>
+                <a href="{% url forum-main %}">Forum</a>
+                <a href="{% url downloads-main %}">Downloads</a>
+                <a href="http://store.overwolf.com/app/aRestless-SweetFX-Preset-Selector">Overwolf Ingame app</a>
+            </li>
+        </ul>
+        <ul class="horizmenu usermenu">
+            {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url user-detail user.username %}">{{ user }}</a>
+                </li>
+                <li>
+                    <a href="{% url user-alerts %}" {% if user.get_profile.alerts%}class="alerttext"{% endif %}>Alerts</a>
+                </li>
+                <li>
+                    <a href="/accounts/logout/">Log out</a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="/accounts/login/?next={{ request.path }}">Log in</a>
+                </li>
+            {% endif %}
+            {% if user.is_staff %}
+                <li><a id="adminlink" href="/admin/" target="_new">Admin</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+{% block page %}
+    <div id="sidemenu">
+        <ul class="list">{% block sidemenu %}{% endblock %}</ul>
+    </div>
+
+    <div id="rightside">
+        {% block rightside %}{% endblock %}
+        {% include "inc/latestthreads.html" %}
+    </div>
+
+    <div id="main">
+        {% block main %}{% endblock %}
+        <div id="footer"></div>
+    </div>
+{% endblock %}
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-7375938-9']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

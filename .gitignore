@@ -1,0 +1,8 @@
+*.swp
+settings_local.py
+*.pyc
+*.sqlite3
+.sass-cache
+/static/
+en/
+.vscode/

@@ -1,0 +1,37 @@
+{% extends "downloads/base.html" %}
+
+{% block main %}
+<h2>Downloads</h2>
+<div>This is a section for SweetFX and SweetFX related files.</div>
+    {% for category in object_list %}
+    <div class="category">
+        <div class="categoryname">
+            <h3>{{ category.name }}</h3>
+        </div>
+        <div class="catdownloads">
+            <table class="categorydltable list">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Added</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dl in category.downloadfile_set.all %}
+                        <tr>
+                            <td>{{ dl.name }}</td>
+                            <td>{{ dl.description|linebreaksbr }}</td>
+                            <td>{{ dl.added }}</td>
+                            <td><a href="{{ dl.dlfile.url }}">Download</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% empty %}
+        <p>Nothing here yet..</p>
+    {% endfor %}
+{% endblock %}

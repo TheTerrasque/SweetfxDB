@@ -1,0 +1,16 @@
+{% extends "forum/base.html" %}
+
+{% block main %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url forum-main %}">Forums</a></li>
+        <li>Edit post</li>
+    </ul>
+</div>
+    <div id="writepost">
+        <div class="bbhelp">
+            {% include "inc/bbhelp.html" %}
+        </div
+        {% include "shared/form.html" %}
+    </div>
+{% endblock %}

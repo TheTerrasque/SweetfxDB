@@ -1,0 +1,23 @@
+{% extends "gamedb/base_gamedb.html" %}
+{% load bbcode %}
+{% block title %}Shader {{ object }}{% endblock %}
+
+{% block main %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url g-shader-list %}">Shaders</a></li>
+        <li>{{ object.render }}</li>
+    </ul>
+</div>
+
+<div id="shaderdetail">
+    <h2>Shader {{ object }}</h2>
+    {% if object.url %}
+        <div id="homepagelink"><a href="{{ object.url }}">{{ object }} homepage</a></div>
+    {% endif %}
+    {% if object.download %}
+        <div id="downloadlink"><a href="{{ object.download.dlfile.url }}">Download shader</a></div>
+    {% endif %}
+    <div id="infobox">{{ object.description|default:"No description provided"|bbcode }}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "silly/base.html" %}
+
+{% block main %}
+<h2>Random Game Name Generator</h2>
+<div id="randgame">
+    <ul id="randgamelist" class="gamenames list">
+        <li>Loading..</li>
+    </ul>
+</div>
+<script src="{{ STATIC_URL }}js/randgame.js"></script>
+<script>
+    $(document).ready(function () {
+        var rg = new RandGame("#randgamelist", "{% url silly-js-gamename %}");
+        rg.start(10);
+    });
+</script>
+{% endblock %}

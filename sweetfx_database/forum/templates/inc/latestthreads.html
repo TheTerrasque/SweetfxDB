@@ -1,0 +1,16 @@
+{% load bbcode %}
+{% load cache %}
+
+{% get_latest_forumthreads "4" as threads %}
+<div id="latestposts" class="box">
+    <div class="header">Latest forum threads</div>
+    {% for thread in threads %}
+        <div class="entry">
+            <div class="title"><a href="{{ thread.get_absolute_url }}">{{ thread.title }}</a></div>
+            <div class="updated">{{ thread.updated|timesince }} ago</div>
+            <div class="updatedby">by 
+                {% cache 600 userlink thread.last_post.creator_id %}{% include "shared/user.html" with user=thread.last_post.creator %}{% endcache %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

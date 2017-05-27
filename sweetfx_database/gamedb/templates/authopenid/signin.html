@@ -1,0 +1,38 @@
+{% extends "authopenid/base.html" %}
+
+{% block head %}
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL}}openid/css/openid.css" />
+<script type="text/javascript" src="{{ STATIC_URL}}openid/js/openid-jquery.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL}}openid/js/openid-en.js"></script>
+<script>
+    $(document).ready(function() {
+        openid.img_path = "{{ STATIC_URL}}openid/images/";
+        openid.input_name = "openid_url";
+        openid.init('id_openid_url');
+    });
+</script>
+{% endblock %}
+
+{% block main %}
+<div id="openidform">
+    <h3>OpenID Login</h3>
+    <div id="openid_choice">
+        <p>Please click your account provider:</p>
+        <div id="openid_btns"></div>
+    </div>
+    <form method="post" action="." enctype="multipart/form-data" id="openid_form">
+        <table id="openid_input">
+                {{ form1 }}
+                <tr><td><input type="submit" class="button" value="Submit OpenID"></td></tr>
+        </table>
+        {% csrf_token %}
+
+    <div id="openid_input_area"></div>
+</form>
+
+</div>
+<div id="legacylogin">
+    <h3>Legacy Login</h3>
+    {% include "shared/form.html" with form=form2 %}
+</div>
+{% endblock %}

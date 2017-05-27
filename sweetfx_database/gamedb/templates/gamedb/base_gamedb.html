@@ -1,0 +1,62 @@
+{% extends "base/base.html" %}
+
+{% block sidemenu %}
+    <li><a href="{% url g-preset-new-list %}">Latest presets</a></li>
+    <li><a href="{% url g-preset-popular-list %}">Popular presets</a></li>
+    <br/>
+    <li><a href="{% url g-show-template "install" %}">Install help</a></li>
+    <li><a href="{% url g-show-template "addgame" %}">How to add a preset</a></li>
+    <br/>
+    <li><a class="rss" href="{% url g-feed-presets %}">RSS Feed</a></li>
+    <br/>
+    <li><input id="isearch" name="search" placeholder="Search"/></li>
+    <script>
+        function position_under(parentelem, underelem, loffset) {
+            var top = parentelem.offset().top + parentelem.outerHeight();
+            var left = parentelem.offset().left + loffset;
+            underelem.offset({top: top, left: left});
+        }
+        function search(query) {
+            $(".searchdiv").remove();
+            
+            var sdiv = $("<div/>").addClass("searchdiv");
+            sdiv.click( function () {
+                sdiv.remove();
+            });
+            var rdiv = $("<div/>").addClass("searchdivresult");
+            
+            sdiv.append(rdiv);
+            $("body").append(sdiv);
+            position_under($("#isearch"), sdiv, -5);
+            rdiv.append($("<span/>").text("Searching..."));
+            
+            $.get("{% url g-game-search %}", {"query": query}, function (data) {
+                rdiv.empty();
+                
+                $.each(data, function (i, val) {
+                    var tdiv = $("<div/>").addClass("stitle").text(i);
+                    var rl = $("<ul/>").addClass("sresults");
+                    rdiv.append(tdiv);
+                    rdiv.append(rl);
+                    if ($.isEmptyObject(val)) {
+                       rdiv.append($("<span/>").text("No results!")); 
+                    }
+                    $.each(val, function (ii, ival) {
+                        console.log("Loop : " + ii + " | " + ival);
+                        var l = $("<a/>").text(ival.title);
+                        l.attr("href", ival.url);
+                        var li = $("<li/>");
+                        li.append(l);
+                        rl.append(li);
+                    });
+                });
+            });
+        }
+        $("#isearch").keydown(function (event) {
+            if (event.which == 13) {
+                search($("#isearch").val());
+                $("#isearch").val("");
+            }
+        });
+    </script>
+{% endblock %}

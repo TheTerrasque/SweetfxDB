@@ -1,0 +1,1 @@
+{% load url from future %}{% ifequal object.creator user %}<div id="editlink"><a href="{% url urlid object.id %}">Edit {{ name }}</a></div>{% endifequal %}

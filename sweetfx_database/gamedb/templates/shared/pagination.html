@@ -1,0 +1,11 @@
+{% if is_paginated %}
+<div id="paginator">
+    <ul class="pagination horizmenu">
+    {% for pagenum in paginator.page_range %}
+        <li {% if page_obj.number == pagenum %} class="active"{% endif %}><a href="?page={{ pagenum }}">{{ pagenum }}</a></li>
+    {% endfor %}
+    {% if page_obj.has_next %}<li><a href="?page={{ page_obj.next_page_number }}">Next page</a></li>{% endif %}
+    </ul>
+    
+</div>
+{% endif %}

@@ -1,0 +1,32 @@
+{% extends "forum/base.html" %}
+{% load cache %}
+
+{% block main %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url forum-main %}">Forums</a></li>
+    </ul>
+</div>
+<table id="forumlist" class="forumtable list">
+    <thead>
+        <tr>
+            <td>Forum</td>
+            <td>Last updated</td>
+            <td>Last thread</td>
+            <td>By user</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for forum in object_list %}
+            <tr>
+                <td class="forumname"><a href="{{ forum.get_absolute_url }}">{{ forum.title }}</a></td>
+                <td>{{ forum.updated|timesince }} ago</td>
+                <td>{{ forum.last_thread.render }}</td>
+                <td>
+                    {% cache 600 userlink forum.last_thread.last_post.creator_id %}{% include "shared/user.html" with user=forum.last_thread.last_post.creator %}{% endcache %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

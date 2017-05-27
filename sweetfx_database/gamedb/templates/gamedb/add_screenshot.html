@@ -1,0 +1,19 @@
+{% extends "gamedb/base_gamedb.html" %}
+
+{% block main %}
+ {% include "shared/form.html" %}
+
+ <h3>Formats</h3>
+ <p>
+     When uploading, please use the PNG format. If you don't have software capable of saving to PNG, you can use <a href="http://www.irfanview.com/">IrfanView</a>.
+ </p>
+
+ <h3>Comparison image</h3>
+ <p>
+     When using comparison image functionality, try to make the screenshots as similar as possible. One neat trick can be to bind the SweetFX screenshot button to the same as the ingame screenshot button, and thus take two images at (almost) the same time.
+ </p>
+ 
+   <div style="padding: 10px;" id="bbhelpwrap">
+ {% include "inc/bbhelp.html" %}
+ </div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "silly/base.html" %}
+{% load humanize %}
+
+{% block main %}
+<h2>Just some silly stuff</h2>
+<p>This is just a bit of sillyness I puffed together when working on other parts of the site.</p>
+
+<h3><a href="{% url silly-template "names" %}">Random Game Names</a></h3>
+<p>I needed some test data for checking how a full list looked, and to test pagination. And as you can imagine,
+just seeing "Test Entry ###" again and again is boring and don't show well difference between long and short names.</p>
+
+<p>The result was, of course, something to spit out random names. And it .. err .. grew a bit. Right now it can generate <span class="bold">{{ total_names|intcomma }}</span> unique names :)</p>
+<p>Just click on the link on the left to see some of those randomly generated names. Oh, and a new name will be added at the bottom of the list every 7 seconds.</p>
+<p>Now and again it spits out actual game names, mostly it spit out silly
+game names, a few times it will produce something nonsensical, and sometimes ..
+Sometimes the result is hilarious :)</p>
+{% endblock %}

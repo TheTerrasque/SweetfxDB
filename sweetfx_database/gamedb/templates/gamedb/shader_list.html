@@ -1,0 +1,21 @@
+{% extends "gamedb/base_gamedb.html" %}
+
+{% block title %}Shaders{% endblock %}
+
+{% block main %}
+<div id="breads">
+    <ul class="horizmenu">
+        <li><a href="{% url g-shader-list %}">Shaders</a></li>
+    </ul>
+</div>
+
+<div id="shaderlist">
+    <table>
+    {% for shader in object_list %}
+        <tr>
+            <td>{{shader.render}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+{% endblock %}

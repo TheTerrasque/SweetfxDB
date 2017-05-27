@@ -1,0 +1,34 @@
+{% extends "gamedb/base_gamedb.html" %}
+
+{% block main %}
+    <div id="breads">
+        <ul class="horizmenu">
+            <li><a href="{% url g-games-list %}">Games list</a></li>
+        </ul>
+    </div>
+    {% include "shared/ads.html" %}
+    <table class="list" id="gamelist">
+    <tr>
+        <th>Game</th>
+        <th>Presets</th>
+        <th>Added by</th>
+    </tr>
+    {% for game in object_list %}
+        <tr>
+            <td>
+                {{ game.render }}
+            </td>
+            <td>
+                {{ game.preset_count }}
+            </td>
+            <td>
+                {% include "shared/user.html" with user=game.creator %}
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% include "shared/pagination.html" %}
+    <div class="buttoner">
+        <a href="{% url g-game-add %}" class="button">Add a game to the list</a>
+    </div>
+{% endblock %}

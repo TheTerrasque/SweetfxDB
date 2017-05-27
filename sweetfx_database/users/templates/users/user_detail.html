@@ -1,0 +1,19 @@
+{% extends "users/base.html" %}
+{% load bbcode %}
+
+{% block title %}User {{ object|title }}{% endblock %}
+
+{% block main %}
+<div>
+    <h2>{{ object|title  }}</h2>
+    Joined the site {{ object.date_joined|timesince }} ago
+    
+    {% if object.get_profile.description %}
+    <div id="userdescription">
+        {{ object.get_profile.description|bbcode }}
+    </div>
+    {% endif %}
+</div>
+
+    {% include "shared/preset_list.html" with presets=object.preset_set.all %}
+{% endblock %}

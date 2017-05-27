@@ -1,0 +1,12 @@
+{% load bbcode %}
+{% get_latest_forumposts "4" as posts %}
+<div id="latestposts" class="box">
+    <div class="header">Latest forum posts</div>
+    {% for post in posts %}
+        <div class="entry">
+            <div class="title"><a href="{{ post.get_absolute_url }}">{{ post.thread.title }}</a></div>
+            <div class="updated">{{ post.created|timesince }} ago</div>
+            <div class="updatedby">by {{ post.creator.get_profile.render }}</div>
+        </div>
+    {% endfor %}
+</div>
