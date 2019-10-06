@@ -9,3 +9,4 @@ pyparsing==2.4.2
 python-openid==2.2.5
 scss==0.8.72
 django-debug-toolbar==2.0
+psycopg2
