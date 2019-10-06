@@ -1,6 +1,6 @@
 from PIL import Image
 from PIL import ImageFile
-import cStringIO
+from io import BytesIO
 from django.core.files.uploadedfile import SimpleUploadedFile
 import os.path
 
@@ -30,7 +30,7 @@ class BaseImage(object):
         return self.save_options
     
     def store_image(self):
-        res = cStringIO.StringIO()
+        res = BytesIO()
         ImageFile.MAXBLOCK = 1024 * 1024
         options = self.get_save_options()
         self.image.save(res, **options)

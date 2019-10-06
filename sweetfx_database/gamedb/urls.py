@@ -1,10 +1,10 @@
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import url
 from sweetfx_database.gamedb import views
 from django.contrib.auth.decorators import login_required as li
 
-import feeds
+from . import feeds
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', views.GameList.as_view(), name='g-games-list'),
     url(r'game/(?P<pk>\d+)/$', views.GameDetails.as_view(), name='g-game-detail'),
     url(r'game/(?P<pk>\d+)/new_preset/$', views.AddPreset.as_view(), name='g-game-add-preset'),
@@ -31,4 +31,4 @@ urlpatterns = patterns('',
     url(r'view/(?P<template>\w+)/$', views.ServeTemplate.as_view(), name="g-show-template"),
 
     url(r'rss/$', feeds.LatestPresetsFeed(), name="g-feed-presets"),
-)
+]

@@ -3,7 +3,7 @@ from tools import namegen
 
 from django.views.generic import TemplateView
 from django.http import HttpResponse
-from django.utils import simplejson as json
+import json
 from django.views.decorators.cache import cache_control, never_cache
 
 class GameNames(TemplateView):

@@ -1,11 +1,11 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.views.generic import RedirectView
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
     # Examples:
     url(r'^$', RedirectView.as_view(url="/games/"), name='home'),
     url(r'^games/', include('sweetfx_database.gamedb.urls')),
@@ -18,8 +18,9 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
-    (r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^admin/', admin.site.urls),
+    url(r'^accounts/', include('django_registration.backends.one_step.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
     #(r'^account/', include('django_authopenid.urls')),
     url(r'^api/', include('sweetfx_database.api.urls')),
-)
+]

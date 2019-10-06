@@ -1,4 +1,4 @@
-import models as M
+from . import models as M
 from django.contrib import admin
 
 admin.site.register(M.Forum)

@@ -5,13 +5,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import datetime
 # Create your models here.
+from django.urls import reverse
 
 class Forum(RenderMixin, models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=100)
     updated = models.DateTimeField(auto_now_add=True, db_index=True)
     sorting = models.PositiveIntegerField(default=100, db_index=True)
-    parent = models.ForeignKey('self', blank=True, null=True)
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     threads = models.PositiveIntegerField(default=0)
     slug = models.SlugField()
     last_thread = models.ForeignKey("ForumThread", null=True, blank=True, related_name="forum2", on_delete=models.SET_NULL)
@@ -22,13 +23,12 @@ class Forum(RenderMixin, models.Model):
     class Meta:
         ordering = ['-sorting']
         
-    @models.permalink
     def get_absolute_url(self):
-        return ('forum-view', [self.slug])
+        return reverse('forum-view', args=[self.slug])
         
 class ForumThread(RenderMixin, models.Model):
-    forum = models.ForeignKey(Forum)
-    creator = models.ForeignKey(userdb.User)
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
+    creator = models.ForeignKey(userdb.User, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     posts = models.PositiveIntegerField(default=0)
     sorting = models.PositiveIntegerField(default=100, db_index=True)
@@ -42,13 +42,12 @@ class ForumThread(RenderMixin, models.Model):
     class Meta:
         ordering = ['-sorting', "-updated"]
     
-    @models.permalink
     def get_absolute_url(self):
-        return ('forum-thread', [self.forum.slug, str(self.id)])
+        return reverse('forum-thread', args=[self.forum.slug, str(self.id)])
         
 class ForumPost(models.Model):
-    thread = models.ForeignKey(ForumThread)
-    creator = models.ForeignKey(userdb.User)
+    thread = models.ForeignKey(ForumThread, on_delete=models.CASCADE)
+    creator = models.ForeignKey(userdb.User, on_delete=models.CASCADE)
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -57,9 +56,8 @@ class ForumPost(models.Model):
     def is_edited(self):
         return self.updated and self.created.toordinal() != self.updated.toordinal()
     
-    @models.permalink
     def get_absolute_url(self):
-        return ('forum-thread', [self.thread.forum.slug, str(self.thread.id)])
+        return reverse('forum-thread', args=[self.thread.forum.slug, str(self.thread.id)])
     
     def __unicode__(self):
         return u"%s [%s]" % (self.thread.title, self.id)

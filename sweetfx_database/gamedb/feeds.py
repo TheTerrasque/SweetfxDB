@@ -1,5 +1,5 @@
 from django.contrib.syndication.views import Feed
-import models as gamedb
+from . import models as gamedb
 
 class LatestPresetsFeed(Feed):
     title = "SweetFX Game Settings"

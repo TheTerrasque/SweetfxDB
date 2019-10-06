@@ -15,7 +15,7 @@ class DownloadCategory(models.Model):
         
 class DownloadFile(models.Model):
     dlfile = models.FileField(upload_to="downloads")
-    category = models.ForeignKey(DownloadCategory)
+    category = models.ForeignKey(DownloadCategory, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     
     added = models.DateTimeField(auto_now_add=True)

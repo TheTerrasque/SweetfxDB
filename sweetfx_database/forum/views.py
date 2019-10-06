@@ -1,7 +1,7 @@
-import models as forumdb
+from . import models as forumdb
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
 from sweetfx_database.gamedb.views import LoginReq, PaginateMixin
-import forms
+from . import forms
 from django.utils.html import escape
 
 class ForumList(PaginateMixin, ListView):

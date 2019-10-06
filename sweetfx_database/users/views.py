@@ -1,7 +1,7 @@
 from sweetfx_database.gamedb import models as gamedb
 from sweetfx_database.users import models as userdb
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView
-import forms
+from . import forms
 
 from django.shortcuts import redirect
 

@@ -1,13 +1,13 @@
-import models as gamedb
+from . import models as gamedb
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 # Create your views here.
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
-import forms
+from . import forms
 from datetime import datetime
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
-from django.utils import simplejson
+import json
 
 from django.http import Http404
 
@@ -50,7 +50,7 @@ def search(request):
         games = gamedb.Game.active.filter(title__icontains=query)[:5]
         r = {}
         r["Games"] = [{"title": x.title, "url": x.get_absolute_url()} for x in games]
-        data = simplejson.dumps(r)
+        data = json.dumps(r)
     return HttpResponse(data, mimetype="text/json")
     
 
