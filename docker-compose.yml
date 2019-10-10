@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  sweetfx:
+    build: .
+    restart: always
+    ports:
+     - "8124:80"
+    volumes:
+      - .:/usr/src/app/
+      # - ./settings_local.py:/usr/src/app/sweetfx_database/settings_local.py
+      #- media:/usr/src/app/media/  # Uploaded files
+      #- sqlite:/usr/src/app/data/  # SQLite database
+
+volumes:
+  media:
+  sqlite:

@@ -5,5 +5,5 @@
 {% with formtarget=".?next="|add:next %}
 {% include "shared/form.html" %}
  {% endwith %} {% endwith %}
- <a href="{% url registration_register %}">New account</a>
+ <a href="{% url 'django_registration_register' %}">New account</a>
 {% endblock %}

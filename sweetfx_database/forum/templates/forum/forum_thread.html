@@ -7,7 +7,7 @@
     
     <div id="breads">
         <ul class="horizmenu">
-            <li><a href="{% url forum-main %}">Forums</a></li>
+            <li><a href="{% url 'forum-main' %}">Forums</a></li>
             <li>{{ thread.forum.render }}</li>
             <li>{{ thread.render }}</li>
         </ul>
@@ -22,7 +22,7 @@
                 {% if post.is_edited %}
                     <div class="edited">Edited {{ post.updated|timesince }} ago</div>
                 {% endif %}
-                {% ifequal post.creator user %}<div class="editpost"><a href="{% url forum-post-edit post.id %}">Edit post</a></div>{% endifequal %}
+                {% ifequal post.creator user %}<div class="editpost"><a href="{% url 'forum-post-edit' post.id %}">Edit post</a></div>{% endifequal %}
             </div>
             <div class="text">{{ post.text|bbcode }}</div>
         </div>
@@ -34,7 +34,7 @@
             <div class="bbhelp">
                 {% include "inc/bbhelp.html" %}
             </div>
-            <form method="post" action="{% url forum-thread-post thread.forum.slug thread.id %}" enctype="multipart/form-data"{%if formid %} id="{{ formid }}" {% endif %}>
+            <form method="post" action="{% url 'forum-thread-post' thread.forum.slug thread.id %}" enctype="multipart/form-data"{%if formid %} id="{{ formid }}" {% endif %}>
                 <textarea name="text"></textarea>
                 {% csrf_token %}
                 <div><input type="submit" class="button" value="Submit new post"></div>

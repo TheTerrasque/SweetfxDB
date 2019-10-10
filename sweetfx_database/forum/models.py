@@ -17,7 +17,7 @@ class Forum(RenderMixin, models.Model):
     slug = models.SlugField()
     last_thread = models.ForeignKey("ForumThread", null=True, blank=True, related_name="forum2", on_delete=models.SET_NULL)
     
-    def __unicode__(self):
+    def __str__(self):
         return u"%s" % self.title
 
     class Meta:
@@ -36,7 +36,7 @@ class ForumThread(RenderMixin, models.Model):
     updated = models.DateTimeField(auto_now_add=True, db_index=True)
     last_post = models.ForeignKey("ForumPost", null=True, blank=True, on_delete=models.SET_NULL)
     
-    def __unicode__(self):
+    def __str__(self):
         return u"%s" % self.title
         
     class Meta:
@@ -59,7 +59,7 @@ class ForumPost(models.Model):
     def get_absolute_url(self):
         return reverse('forum-thread', args=[self.thread.forum.slug, str(self.thread.id)])
     
-    def __unicode__(self):
+    def __str__(self):
         return u"%s [%s]" % (self.thread.title, self.id)
 
 @receiver(post_save, sender=ForumPost)

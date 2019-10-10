@@ -20,7 +20,7 @@ class Theme(models.Model):
     title = models.CharField(max_length=100)
     css = models.CharField(blank=True, max_length=255, help_text="CSS url for the theme", verbose_name="CSS url")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 class PresetFavorite(models.Model):

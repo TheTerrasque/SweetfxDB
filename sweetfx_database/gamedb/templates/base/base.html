@@ -18,20 +18,20 @@
         </div>
         <ul class="horizmenu">
             <li>
-                <a href="{% url g-games-list %}">Games list</a>
-                <a href="{% url silly-home %}">Silly stuff</a>
-                <a href="{% url forum-main %}">Forum</a>
-                <a href="{% url downloads-main %}">Downloads</a>
+                <a href="{% url 'g-games-list' %}">Games list</a>
+                <a href="{% url 'silly-home' %}">Silly stuff</a>
+                <a href="{% url 'forum-main' %}">Forum</a>
+                <a href="{% url 'downloads-main' %}">Downloads</a>
                 <a href="http://store.overwolf.com/app/aRestless-SweetFX-Preset-Selector">Overwolf Ingame app</a>
             </li>
         </ul>
         <ul class="horizmenu usermenu">
             {% if user.is_authenticated %}
                 <li>
-                    <a href="{% url user-detail user.username %}">{{ user }}</a>
+                    <a href="{% url 'user-detail' user.username %}">{{ user }}</a>
                 </li>
                 <li>
-                    <a href="{% url user-alerts %}" {% if user.get_profile.alerts%}class="alerttext"{% endif %}>Alerts</a>
+                    <a href="{% url 'user-alerts' %}" {% if user.get_profile.alerts%}class="alerttext"{% endif %}>Alerts</a>
                 </li>
                 <li>
                     <a href="/accounts/logout/">Log out</a>

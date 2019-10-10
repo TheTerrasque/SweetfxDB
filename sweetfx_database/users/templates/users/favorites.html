@@ -23,7 +23,7 @@
                 <td>{{ presetfav.preset.creator.get_profile.render }}</td>
                 <td>{{ presetfav.added }}</td>
                 <td>
-                    <form method="post" action="{% url user-rmfav %}">
+                    <form method="post" action="{% url 'user-rmfav' %}">
                         <input type="hidden" name="preset" value="{{ presetfav.preset.id }}">
                         <input type="submit" value="Remove">
                         {% csrf_token %}

@@ -6,7 +6,7 @@
 {% block main %}
 <div id="breads">
     <ul class="horizmenu">
-        <li><a href="{% url g-games-list %}">Games list</a></li>
+        <li><a href="{% url 'g-games-list' %}">Games list</a></li>
         <li>{{ object.game.render }}</li>
         <li>{{ object.render }}</li>
     </ul>
@@ -24,7 +24,7 @@
     </div>
     
     {% if object not in user.get_profile.get_fav_presets %}
-       <form method="post" action="{% url user-addfav %}">
+       <form method="post" action="{% url 'user-addfav' %}">
             <input type="hidden" name="preset" value="{{object.id }}">
             <input type="submit" value="Add to favorite">
             {% csrf_token %}
@@ -40,7 +40,7 @@
 
     <div id="presettextwrapper">
         <div class="buttoner">
-            <a href="{% url g-preset-download object.id %}" class="button">Download preset</a>
+            <a href="{% url 'g-preset-download' object.id %}" class="button">Download preset</a>
             <span id="toggleshow" class="button">Show / Hide settings</span>
         </div>
 
@@ -50,7 +50,7 @@
         <h3>Screenshots</h3>
         <div id="screenshots">
         {% ifequal user object.creator %}
-            <div class="buttoner"><a href="{% url g-preset-add-screenshot object.id %}" class="button">Add new screenshot</a></div>
+            <div class="buttoner"><a href="{% url 'g-preset-add-screenshot' object.id %}" class="button">Add new screenshot</a></div>
         {% endifequal %}
         {% for image in object.get_screenshots %}
             <div class="presetimageblock">

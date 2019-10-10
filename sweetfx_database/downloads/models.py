@@ -7,7 +7,7 @@ class DownloadCategory(models.Model):
     sortweight = models.IntegerField(default=100)
     description = models.TextField(blank=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:
@@ -23,7 +23,7 @@ class DownloadFile(models.Model):
     sortweight = models.IntegerField(default=100)
     description = models.TextField(blank=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:

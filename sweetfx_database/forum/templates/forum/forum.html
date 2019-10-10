@@ -4,7 +4,7 @@
 {% block main %}
 <div id="breads">
     <ul class="horizmenu">
-        <li><a href="{% url forum-main %}">Forums</a></li>
+        <li><a href="{% url 'forum-main' %}">Forums</a></li>
         <li>{{ forum.render }}</li>
     </ul>
 </div>
@@ -31,5 +31,5 @@
         </tbody>
     </table>
     
-<div id="newthreadlink"><a href="{% url forum-new-thread forum.slug %}">New thread</a></div>
+<div id="newthreadlink"><a href="{% url 'forum-new-thread' forum.slug %}">New thread</a></div>
 {% endblock %}

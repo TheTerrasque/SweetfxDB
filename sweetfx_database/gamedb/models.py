@@ -52,7 +52,7 @@ class UserComment(models.Model):
     object_id = models.PositiveIntegerField(db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s comment by %s" % (self.content_type, self.creator)
 
     def get_text_start(self):
@@ -86,7 +86,7 @@ class Game(RenderMixin, models.Model):
     def get_presets(self):
         return self.preset_set.filter(visible=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -102,7 +102,7 @@ class Shader(RenderMixin, models.Model):
     description = models.TextField(blank=True)
     download = models.ForeignKey("downloads.DownloadFile", null=True, blank = True, on_delete=models.CASCADE)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:
@@ -143,7 +143,7 @@ class Preset(RenderMixin, models.Model):
     def is_active(self, user=None):
         return self.visible
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -226,7 +226,7 @@ class PresetScreenshot(RenderMixin, models.Model):
     def get_comments(self):
         return self.comments.filter(visible=True)
         
-    def __unicode__(self):
+    def __str__(self):
         return u"Screenshot - %s (%s)" % (self.preset, self.preset.game)
 
     class Meta:

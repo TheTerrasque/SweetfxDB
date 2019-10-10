@@ -5,7 +5,7 @@
 {% block main %}
 <div id="breads">
     <ul class="horizmenu">
-        <li><a href="{% url g-games-list %}">Games list</a></li>
+        <li><a href="{% url 'g-games-list' %}">Games list</a></li>
         <li>{{ object.render }}</li>
     </ul>
 </div>
@@ -25,7 +25,7 @@
     {% endif %}
     {% include "shared/preset_list.html" with presets=object.get_presets hidegame=1 %}
     <div class="buttoner">
-            <a href="{% url g-game-add-preset object.id %}" class="button">Add a preset</a>
+            <a href="{% url 'g-game-add-preset' object.id %}" class="button">Add a preset</a>
     </div>
     {% include "shared/comments.html" %}
 </div>

@@ -10,7 +10,7 @@
 <script src="{{ STATIC_URL }}js/randgame.js"></script>
 <script>
     $(document).ready(function () {
-        var rg = new RandGame("#randgamelist", "{% url silly-js-gamename %}");
+        var rg = new RandGame("#randgamelist", "{% url 'silly-js-gamename' %}");
         rg.start(10);
     });
 </script>
