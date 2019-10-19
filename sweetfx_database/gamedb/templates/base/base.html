@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>{%block title%}SweetFX Settings Database{% endblock %}</title>
-    {% if user.is_authenticated and user.get_profile.css %}
-        <link rel="stylesheet" href="{{ user.get_profile.css }}" />
+    {% if user.is_authenticated and user.userprofile.css %}
+        <link rel="stylesheet" href="{{ user.userprofile.css }}" />
     {% else %}
         <link rel="stylesheet" href="{{ CSSURL}}" />
     {% endif %}
@@ -31,7 +31,7 @@
                     <a href="{% url 'user-detail' user.username %}">{{ user }}</a>
                 </li>
                 <li>
-                    <a href="{% url 'user-alerts' %}" {% if user.get_profile.alerts%}class="alerttext"{% endif %}>Alerts</a>
+                    <a href="{% url 'user-alerts' %}" {% if user.userprofile.alerts%}class="alerttext"{% endif %}>Alerts</a>
                 </li>
                 <li>
                     <a href="/accounts/logout/">Log out</a>

@@ -34,7 +34,7 @@ class UserAlerts(LoginReq, ListView):
     template_name = "users/alerts.html"
     
     def get_queryset(self):
-        p=self.request.user.get_profile()
+        p=self.request.user.userprofile
         p.alerts = False
         p.save()
         return userdb.Alert.objects.filter(owner=self.request.user)
@@ -44,7 +44,7 @@ class UserProfile(LoginReq, UpdateView):
     form_class = forms.ProfileForm
 
     def get_object(self):
-        return self.request.user.get_profile()
+        return self.request.user.userprofile
 
 @login_required
 def remove_preset_from_favorite(request):

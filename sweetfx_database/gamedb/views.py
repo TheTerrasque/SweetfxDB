@@ -96,7 +96,7 @@ def download_preset(request, pk):
     
     r.downloads +=1
     r.save()
-    response = HttpResponse(mimetype='text/plain')
+    response = HttpResponse(content_type='text/plain')
     response['Content-Disposition'] = 'attachment; filename="SweetFX_Settings_%s_%s.txt"' % (r.game.title.encode("utf8"), r.title.encode("utf8"))
     response.write(r.settings_text)
     return response
@@ -122,7 +122,7 @@ class EditPreset(LoginReq, UpdateView):
     def form_valid(self, form):
         form.instance.updated = datetime.now()
         for fav in form.instance.favorites.all():
-            fav.user.get_profile().add_alert(u"Preset %s was updated" % form.instance.render())
+            fav.user.userprofile.add_alert(u"Preset %s was updated" % form.instance.render())
         return super(EditPreset, self).form_valid(form)
 
     def get_queryset(self):

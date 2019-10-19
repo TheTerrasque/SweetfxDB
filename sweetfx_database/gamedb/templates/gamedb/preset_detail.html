@@ -23,7 +23,7 @@
         <div class="infoline">Shader used: {{ object.shader.render }}</div>
     </div>
     
-    {% if object not in user.get_profile.get_fav_presets %}
+    {% if object not in user.userprofile.get_fav_presets %}
        <form method="post" action="{% url 'user-addfav' %}">
             <input type="hidden" name="preset" value="{{object.id }}">
             <input type="submit" value="Add to favorite">
