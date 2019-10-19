@@ -8,11 +8,16 @@
     <h2>{{ object|title  }}</h2>
     Joined the site {{ object.date_joined|timesince }} ago
     
+    {% if user.is_superuser %} 
+      <div><a href="/admin/auth/user/{{ object.id }}/change/">Admin user</a></div>
+    {% endif %}
+
     {% if object.get_profile.description %}
     <div id="userdescription">
         {{ object.get_profile.description|bbcode }}
     </div>
     {% endif %}
+          
 </div>
 
     {% include "shared/preset_list.html" with presets=object.preset_set.all %}

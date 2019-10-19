@@ -21,6 +21,7 @@ class AboutView(TemplateView):
 class UserDetail(DetailView):
     model = gamedb.User
     slug_field = "username"
+    context_object_name = "object"
     template_name = "users/user_detail.html"
 
 
@@ -45,6 +46,15 @@ class UserProfile(LoginReq, UpdateView):
 
     def get_object(self):
         return self.request.user.userprofile
+
+@login_required
+def remove_user(request):
+    uid = request.POST.get("userid")
+    if request.method=="POST" and request.user.is_superuser and uid:
+        user = userdb.User.objects.get(id=uid)
+        user.delete()
+    return redirect("/")
+
 
 @login_required
 def remove_preset_from_favorite(request):

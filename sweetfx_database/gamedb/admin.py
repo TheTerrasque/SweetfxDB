@@ -10,7 +10,7 @@ class Preset(reversion.VersionAdmin):
 class Comment(reversion.VersionAdmin):
     list_filter = ["visible", "content_type"]
     list_display = ["creator", "content_type", "visible", "added", "get_text_start"]
-    search_fields = ["creator__username"]
+    search_fields = ["creator__username", "comment"]
     date_hierarchy = "added"
 
 class Screenshot(reversion.VersionAdmin):
