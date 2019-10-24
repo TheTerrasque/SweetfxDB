@@ -6,7 +6,7 @@
         <div class="entry">
             <div class="title"><a href="{{ post.get_absolute_url }}">{{ post.thread.title }}</a></div>
             <div class="updated">{{ post.created|timesince }} ago</div>
-            <div class="updatedby">by {{ post.creator.get_profile.render }}</div>
+            <div class="updatedby">by {{ post.creator.userprofile.render }}</div>
         </div>
     {% endfor %}
 </div>

@@ -12,9 +12,9 @@
       <div><a href="/admin/auth/user/{{ object.id }}/change/">Admin user</a></div>
     {% endif %}
 
-    {% if object.get_profile.description %}
+    {% if object.userprofile.description %}
     <div id="userdescription">
-        {{ object.get_profile.description|bbcode }}
+        {{ object.userprofile.description|bbcode }}
     </div>
     {% endif %}
           

@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
 from . import forms
 from datetime import datetime
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.contenttypes.models import ContentType
 import json
 
@@ -44,14 +44,14 @@ class AddPreset(LoginReq, CreateView):
         return super(AddPreset, self).form_valid(form)
 
 def search(request):
-    query = request.REQUEST.get("query")
+    query = request.GET.get("query") or request.POST.get("query")
     data = {}
     if query:
         games = gamedb.Game.active.filter(title__icontains=query)[:5]
         r = {}
         r["Games"] = [{"title": x.title, "url": x.get_absolute_url()} for x in games]
-        data = json.dumps(r)
-    return HttpResponse(data, mimetype="text/json")
+        #data = json.dumps(r)
+    return JsonResponse(r)
     
 
 class AddGame(LoginReq, CreateView):
@@ -151,14 +151,14 @@ def save_comment(request):
     if comment:
         ctype = ContentType.objects.get(model=cname)
         obj = ctype.get_object_for_this_type(id=cid)
-        objname = escape(unicode(obj))
+        objname = escape(str(obj))
         c = gamedb.UserComment(comment=comment, creator=request.user)
         c.content_object = obj
         c.save()
         
         if request.user != obj.creator:
             msg = "You have a new comment on : <a href='%s'>%s</a>" % (obj.get_absolute_url(), objname)
-            obj.creator.get_profile().add_alert(msg)
+            obj.creator.userprofile.add_alert(msg)
         
         return HttpResponseRedirect(obj.get_absolute_url() + "#comments")
     return HttpResponseRedirect("/")

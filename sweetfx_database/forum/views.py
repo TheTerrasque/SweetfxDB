@@ -65,7 +65,7 @@ class NewForumPost(LoginReq, CreateView):
         
         if self.request.user != thread.creator:
             msg = "Someone created a new post on thread : <a href='%s'>%s</a>" % (thread.get_absolute_url(), escape(thread))
-            thread.creator.get_profile().add_alert(msg)
+            thread.creator.userprofile.add_alert(msg)
         
         self.object = form.save(commit=False)
         self.object.creator = self.request.user

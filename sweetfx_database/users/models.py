@@ -55,7 +55,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 def set_unread_alert(sender, instance, created, **kwargs):
     if created:
-        profile = instance.owner.get_profile()
+        profile = instance.owner.userprofile
         profile.alerts = True
         profile.save()
 
