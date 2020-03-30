@@ -62,6 +62,9 @@ class ForumPost(models.Model):
     def __str__(self):
         return u"%s [%s]" % (self.thread.title, self.id)
 
+    class Meta:
+        ordering = ['created']
+
 @receiver(post_save, sender=ForumPost)
 def handle_new_forum_post(sender, **kwargs):
     instance = kwargs["instance"]
