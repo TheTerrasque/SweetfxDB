@@ -62,7 +62,7 @@ padding:0;
 
 body {
 background-color:#FFF;
-background-image: url("pcmr2.gif");
+background-image: url("pcmr.css");
 background-position:75% 50%; 
 background-repeat:no-repeat;
 background-attachment:fixed;
@@ -614,7 +614,7 @@ border-radius: 7px;
 
 input,textarea {
     border-radius: 6px;
-    padding: 5px; !important
+    padding: 5px;
 }
 input:focus,textarea:focus {
     border: 1px solid #FF9191; outline: none !important;
