@@ -12,7 +12,7 @@ RUN pip install --upgrade pip
 COPY reqs.txt ./
 RUN pip install -r reqs.txt
 COPY . .
-RUN mv dockerfiles/supervisord.conf /etc/supervisord.conf && mkdir /etc/uwsgi/ && mv dockerfiles/uwsgi.ini /etc/uwsgi/wsgi.ini && mv dockerfiles/nginx.conf /etc/nginx/sites-enabled/sfx.site && mkdir data && mkdir media && chown www-data data && chown www-data media
+RUN mv dockerfiles/supervisord.conf /etc/supervisord.conf && mkdir -p /etc/uwsgi/ && mv dockerfiles/uwsgi.ini /etc/uwsgi/wsgi.ini && mv dockerfiles/nginx.conf /etc/nginx/sites-enabled/sfx.site && mkdir -p data && mkdir -p media && chown www-data data && chown www-data media
 RUN python manage.py collectstatic
 
 EXPOSE 80
