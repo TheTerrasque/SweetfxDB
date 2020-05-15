@@ -166,11 +166,11 @@ class PresetScreenshot(RenderMixin, models.Model):
         </a>"""
 
     preset = models.ForeignKey(Preset, on_delete=models.CASCADE)
-    image = models.ImageField(verbose_name = _("SweetFX image"), upload_to="presetscreenshots", height_field="image_height", width_field="image_width", help_text= _("The main image, the screenshot itself"))
+    image = models.ImageField(verbose_name = _("SweetFX image"), upload_to="presetscreenshots/%Y/%m/%d/", height_field="image_height", width_field="image_width", help_text= _("The main image, the screenshot itself"))
     image_height = models.IntegerField(default=0)
     image_width = models.IntegerField(default=0)
 
-    comparison_image = models.ImageField(upload_to="presetscreenshotscompare", blank=True, null = True, help_text= _("Optional comparison image, where SweetFX is OFF"))
+    comparison_image = models.ImageField(upload_to="presetscreenshotscompare/%Y/%m/%d/", blank=True, null = True, help_text= _("Optional comparison image, where SweetFX is OFF"))
 
     SFX_STATES = (
         (2, _("Split screen")),
@@ -185,11 +185,11 @@ class PresetScreenshot(RenderMixin, models.Model):
     active = ActiveManager()
     objects = models.Manager()
 
-    medium_thumb = models.ImageField(upload_to="medthumb")
+    medium_thumb = models.ImageField(upload_to="medthumb/%Y/%m/%d/")
 
-    medium_thumb_compared = models.ImageField(upload_to="medthumb", blank = True, null = True)
+    medium_thumb_compared = models.ImageField(upload_to="medthumb/%Y/%m/%d/", blank = True, null = True)
 
-    small_thumb = models.ImageField(upload_to="smallthumb")
+    small_thumb = models.ImageField(upload_to="smallthumb/%Y/%m/%d/")
     created = models.DateField(auto_now_add=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
 

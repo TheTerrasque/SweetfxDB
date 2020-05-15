@@ -1,6 +1,7 @@
 from .models import Theme
+from django.conf import settings
 
-DEFAULT = "/static/css/style.css"
+DEFAULT = settings.CSSURL or "/static/css/style.css"
 
 def set_style(request):
     r = { "CSSURL" : DEFAULT }

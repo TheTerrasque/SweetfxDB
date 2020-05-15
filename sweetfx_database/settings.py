@@ -124,7 +124,8 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-CSSURL = "/static/css/style.css"
+#CSSURL = "/static/css/style.css"
+CSSURL = "/static/css/pcmr/pcmr.css"
 
 INTERNAL_IPS = ["127.0.0.1"]
 
