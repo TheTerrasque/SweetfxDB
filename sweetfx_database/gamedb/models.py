@@ -56,7 +56,7 @@ class UserComment(models.Model):
         return u"%s comment by %s" % (self.content_type, self.creator)
 
     def get_text_start(self):
-        return self.comment[:20]
+        return self.comment[:50]
 
     class Meta:
         ordering = ["-id"]
