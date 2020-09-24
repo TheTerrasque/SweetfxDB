@@ -3,6 +3,10 @@ from PIL import ImageFile
 from io import BytesIO
 from django.core.files.uploadedfile import SimpleUploadedFile
 import os.path
+import subprocess
+
+def optimize_png(filepath):
+    subprocess.run(["optipng", filepath])
 
 class BaseImage(object):
     
@@ -76,4 +80,3 @@ def resize_image(path, size=(1024, 1024), quality=65, format="JPEG"):
     handler.save_options["format"] = format
     handler.save_options["quality"] = quality
     return handler.save_image()
-

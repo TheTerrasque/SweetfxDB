@@ -193,6 +193,14 @@ class PresetScreenshot(RenderMixin, models.Model):
     created = models.DateField(auto_now_add=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    optimized = models.BooleanField(default=False)
+
+    def optimize(self):
+        if self.image.path.lower().endswith(".png"):
+            imageLogic.optimize_png(self.image.path)
+            self.optimized = True
+            self.save()
+
     def compress_main_image(self):
         path = self.image.path
         ci = imageLogic.CompressImage(path)

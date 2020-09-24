@@ -18,7 +18,7 @@ class Comment(reversion.VersionAdmin):
 class Screenshot(reversion.VersionAdmin):
     list_filter = ["visible"]
     search_fields = ["creator__username", "preset__title"]
-    raw_id_fields = ["preset"]
+    raw_id_fields = ["preset", "creator"]
 
 class Game(reversion.VersionAdmin):
     list_display = ["title", "creator"]
