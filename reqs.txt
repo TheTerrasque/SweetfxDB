@@ -13,3 +13,4 @@ psycopg2==2.8.3
 uwsgi==2.0.19.1
 supervisor==4.0.4
 python-memcached==1.59
+graypy

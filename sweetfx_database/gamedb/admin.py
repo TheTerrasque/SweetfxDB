@@ -28,8 +28,7 @@ class Game(reversion.VersionAdmin):
 
 class Shader(reversion.VersionAdmin):
     list_display = ["name", "description", "url"]
-
-    
+   
 
 admin.site.register(M.UserComment, Comment)
 admin.site.register(M.Game, Game)
