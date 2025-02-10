@@ -93,6 +93,9 @@ class Game(RenderMixin, models.Model):
 
     class Meta:
         ordering = ["title"]
+        permissions = [
+            ("post_on_games", "Can post on games"),
+        ]
 
     def get_absolute_url(self):
         return reverse('g-game-detail', args=[str(self.id)])
@@ -280,5 +283,5 @@ def my_handler(sender, **kwargs):
 
 @receiver(user_registered)
 def add_permission(sender, user, request, **kwargs):
-    permission_object = Permission.objects.get(codename="post_on_forum")
+    permission_object = Permission.objects.get(codename="post_on_games")
     user.user_permissions.add(permission_object)

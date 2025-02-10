@@ -1,9 +1,10 @@
 from . import models as gamedb
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required, permission_required
+
 # Create your views here.
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
 from . import forms
+from .mixins import PaginateMixin, GQsMixin, LoginReq
 from datetime import datetime
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.contenttypes.models import ContentType
@@ -12,17 +13,12 @@ from django.http import Http404
 
 from django.utils.html import escape
 
-class LoginReq(object):
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(LoginReq, self).dispatch(*args, **kwargs)
 
-class GQsMixin(object):
-    queryset = gamedb.Game.active.all()
-
-class PaginateMixin(object):
-    paginate_by = 25
+class GamePermissionReq(PermissionRequiredMixin):
+    permission_required = "gamedb.post_on_games"
+    permission_denied_message = "Posting is disabled your user. Contact Terrasque on Discord to enable posting for your account."
 
 class GameList(PaginateMixin, GQsMixin, ListView):
     pass
@@ -30,7 +26,7 @@ class GameList(PaginateMixin, GQsMixin, ListView):
 class GameDetails(GQsMixin, DetailView):
     pass
 
-class AddPreset(LoginReq, CreateView):
+class AddPreset(GamePermissionReq, CreateView):
     form_class = forms.PresetForm
     template_name = "gamedb/add_preset.html"
 
@@ -52,7 +48,7 @@ def search(request):
     return JsonResponse(r)
     
 
-class AddGame(LoginReq, CreateView):
+class AddGame(GamePermissionReq, CreateView):
     form_class = forms.GameForm
     template_name = "gamedb/add_game.html"
 
@@ -61,7 +57,7 @@ class AddGame(LoginReq, CreateView):
         self.object.creator = self.request.user
         return super(AddGame, self).form_valid(form)
 
-class AddScreenshot(LoginReq, CreateView):
+class AddScreenshot(GamePermissionReq, CreateView):
     form_class = forms.PresetScreenshotForm
     template_name = "gamedb/add_screenshot.html"
 
@@ -140,7 +136,7 @@ class EditGame(LoginReq, UpdateView):
     def get_queryset(self):
         return gamedb.Game.objects.filter(creator=self.request.user)
 
-@login_required
+@permission_required("gamedb.post_on_games", raise_exception=True)
 def save_comment(request):
     data = request.POST
     cname = data.get("cname").replace(" ", "")

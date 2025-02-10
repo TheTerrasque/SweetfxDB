@@ -10,7 +10,7 @@ python-openid==2.2.5
 scss==0.8.72
 django-debug-toolbar==2.0
 psycopg2==2.8.3
-#uwsgi==2.0.20
+uwsgi==2.0.20
 supervisor==4.0.4
 python-memcached==1.59
 graypy

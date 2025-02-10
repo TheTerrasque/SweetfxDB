@@ -59,7 +59,7 @@ def get_latest_forumthreads(string=None):
         num = 5
     else:
         num = int(string)
-    return forumdb.ForumThread.objects.select_related("last_post", "forum").order_by("-updated")[:num]
+    return forumdb.ForumThread.objects.latest_threads().select_related("last_post", "forum").order_by("-updated")[:num]
 
 @register.simple_tag
 def get_latest_forumposts(string=None):

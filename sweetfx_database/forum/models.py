@@ -3,9 +3,11 @@ from sweetfx_database.users import models as userdb
 from sweetfx_database.gamedb.models import RenderMixin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import datetime
 # Create your models here.
 from django.urls import reverse
+
+from django_registration.signals import user_registered
+from django.contrib.auth.models import Permission
 
 class Forum(RenderMixin, models.Model):
     title = models.CharField(max_length=50)
@@ -27,13 +29,14 @@ class Forum(RenderMixin, models.Model):
         ]
 
     def update_state(self):
-#forum.updated = datetime.datetime.now()
-#     forum.threads = forum.forumthread_set.count()
-#     forum.last_thread = instance
+        #forum.updated = datetime.datetime.now()
+        #     forum.threads = forum.forumthread_set.count()
+        #     forum.last_thread = instance
         threads = self.get_threads()
         self.threads = threads.count()
-        self.last_thread = threads.last()
-        self.updated = self.last_thread.updated
+        self.last_thread = threads.first()
+        if self.last_thread:
+            self.updated = self.last_thread.updated
         self.save()
 
     def get_threads(self):
@@ -41,7 +44,11 @@ class Forum(RenderMixin, models.Model):
 
     def get_absolute_url(self):
         return reverse('forum-view', args=[self.slug])
-        
+
+class ForumThreadManager(models.Manager):
+    def latest_threads(self):
+        return self.filter(state=1)
+
 class ForumThread(RenderMixin, models.Model):
     forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
     creator = models.ForeignKey(userdb.User, on_delete=models.CASCADE)
@@ -55,6 +62,8 @@ class ForumThread(RenderMixin, models.Model):
         (0, "Hidden"),
         (1, "Visible")
     ], default=1)
+
+    objects = ForumThreadManager()
 
     def __str__(self):
         return u"%s" % self.title
@@ -74,6 +83,7 @@ class ForumThread(RenderMixin, models.Model):
         else:
             self.state = 0
         self.save()
+        self.forum.update_state()
 
     def get_absolute_url(self):
         return reverse('forum-thread', args=[self.forum.slug, str(self.id)])
@@ -92,9 +102,13 @@ class ForumPost(models.Model):
         (2, "Spam")
     ], default=0)
 
-    def update_state(self, newstate):
-        self.state = newstate
-        self.save()
+    def text_short(self):
+        return self.text[:100]
+
+    def update_state(self, newstate=None):
+        if newstate != None:
+            self.state = newstate
+            self.save()
         self.thread.update_state()
 
     def is_edited(self):
@@ -128,3 +142,8 @@ def handle_new_forum_post(sender, **kwargs):
 #     forum.threads = forum.forumthread_set.count()
 #     forum.last_thread = instance
 #     forum.save()
+
+@receiver(user_registered)
+def add_permission(sender, user, request, **kwargs):
+    permission_object = Permission.objects.get(codename="post_on_forum")
+    user.user_permissions.add(permission_object)
