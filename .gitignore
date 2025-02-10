@@ -9,3 +9,5 @@ en/
 .mypy_cache/
 env/
 spam_flush.py
+supervisord.log
+supervisord.pid

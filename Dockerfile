@@ -1,8 +1,8 @@
-FROM python:3.7
+FROM python:3.10
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        postgresql-client nginx python-pip optipng\
+        postgresql-client nginx python3-pip optipng\
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /etc/nginx/fastcgi.conf /etc/nginx/fastcgi_params \
     && rm -f /etc/nginx/snippets/fastcgi-php.conf /etc/nginx/snippets/snakeoil.conf /etc/nginx/sites-enabled/*
