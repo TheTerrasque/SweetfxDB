@@ -1,8 +1,17 @@
+from datetime import timedelta, timezone
+from http.client import HTTPResponse
+from django.contrib.auth.models import Permission
 from . import models as forumdb
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
 from sweetfx_database.gamedb.views import LoginReq, PaginateMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from . import forms
 from django.utils.html import escape
+
+
+class PermissionReq(PermissionRequiredMixin):
+    permission_required = "forum.post_on_forum"
+    permission_denied_message = "Posting is disabled for new users. Contact Terrasque on Discord to enable posting for your account"
 
 class ForumList(PaginateMixin, ListView):
     template_name = "forum/index.html"
@@ -27,7 +36,7 @@ class EditPost(LoginReq, UpdateView):
         base_qs = super(EditPost, self).get_queryset()
         return base_qs.filter(creator=self.request.user)
 
-class NewForumThread(LoginReq, CreateView):
+class NewForumThread(PermissionReq, CreateView):
     form_class = forms.NewThreadForm
     template_name = "forum/new_thread.html"
     
@@ -55,11 +64,16 @@ class NewForumThread(LoginReq, CreateView):
         
         return x
 
-class NewForumPost(LoginReq, CreateView):
+class NewForumPost(PermissionReq, CreateView):
     form_class = forms.NewPostForm
     template_name = "forum/new_thread.html"
     
     def form_valid(self, form):
+        if self.request.user.date_joined > timezone.now() - timedelta(minutes=15):
+            permission_object = Permission.objects.get(codename="post_on_forum")
+            self.request.user.user_permissions.remove(permission_object)
+            return HTTPResponse("A problem occurred. Please contact Terrasque on Discord to fix.")
+        
         pk = self.kwargs['pk']
         thread = forumdb.ForumThread.objects.get(id=pk)
         

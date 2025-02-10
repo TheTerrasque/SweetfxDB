@@ -22,7 +22,23 @@ class Forum(RenderMixin, models.Model):
 
     class Meta:
         ordering = ['-sorting']
-        
+        permissions = [
+            ("post_on_forum", "Can post on forum"),
+        ]
+
+    def update_state(self):
+#forum.updated = datetime.datetime.now()
+#     forum.threads = forum.forumthread_set.count()
+#     forum.last_thread = instance
+        threads = self.get_threads()
+        self.threads = threads.count()
+        self.last_thread = threads.last()
+        self.updated = self.last_thread.updated
+        self.save()
+
+    def get_threads(self):
+        return self.forumthread_set.filter(state=1)
+
     def get_absolute_url(self):
         return reverse('forum-view', args=[self.slug])
         
@@ -35,13 +51,30 @@ class ForumThread(RenderMixin, models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now_add=True, db_index=True)
     last_post = models.ForeignKey("ForumPost", null=True, blank=True, on_delete=models.SET_NULL)
-    
+    state = models.IntegerField(choices=[
+        (0, "Hidden"),
+        (1, "Visible")
+    ], default=1)
+
     def __str__(self):
         return u"%s" % self.title
         
     class Meta:
         ordering = ['-sorting', "-updated"]
     
+    def get_posts(self):
+        return self.forumpost_set.filter(state__in = [0,1])
+
+    def update_state(self):
+        if self.get_posts().exists():
+            self.state = 1
+            self.posts = self.get_posts().count()
+            self.last_post = self.get_posts().last()
+            self.updated = self.last_post.created
+        else:
+            self.state = 0
+        self.save()
+
     def get_absolute_url(self):
         return reverse('forum-thread', args=[self.forum.slug, str(self.id)])
         
@@ -53,6 +86,17 @@ class ForumPost(models.Model):
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     ip = models.CharField(max_length=200, blank=True)
     
+    state = models.IntegerField(choices=[
+        (0, "Unchecked"),
+        (1, "Visible"),
+        (2, "Spam")
+    ], default=0)
+
+    def update_state(self, newstate):
+        self.state = newstate
+        self.save()
+        self.thread.update_state()
+
     def is_edited(self):
         return self.updated and self.created.toordinal() != self.updated.toordinal()
     
@@ -68,18 +112,19 @@ class ForumPost(models.Model):
 @receiver(post_save, sender=ForumPost)
 def handle_new_forum_post(sender, **kwargs):
     instance = kwargs["instance"]
-    if kwargs["created"]:
-        thread = instance.thread
-        thread.last_post = instance
-        thread.updated = datetime.datetime.now()
-        thread.posts = thread.forumpost_set.count()
-        thread.save()
+    instance.update_state()
+    # if kwargs["created"]:
+    #     thread = instance.thread
+    #     thread.last_post = instance
+    #     thread.updated = datetime.datetime.now()
+    #     thread.posts = thread.get_posts().count()
+    #     thread.save()
     
-@receiver(post_save, sender=ForumThread)
-def handle_forum_thread_update(sender, **kwargs):
-    instance = kwargs["instance"]
-    forum = instance.forum
-    forum.updated = datetime.datetime.now()
-    forum.threads = forum.forumthread_set.count()
-    forum.last_thread = instance
-    forum.save()
+# @receiver(post_save, sender=ForumThread)
+# def handle_forum_thread_update(sender, **kwargs):
+#     instance = kwargs["instance"]
+#     forum = instance.forum
+#     forum.updated = datetime.datetime.now()
+#     forum.threads = forum.forumthread_set.count()
+#     forum.last_thread = instance
+#     forum.save()

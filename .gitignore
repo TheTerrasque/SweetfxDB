@@ -7,3 +7,5 @@ settings_local.py
 en/
 .vscode/
 .mypy_cache/
+env/
+spam_flush.py

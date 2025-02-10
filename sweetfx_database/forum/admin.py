@@ -5,10 +5,10 @@ from reversion import admin as reversion
 class ForumThread(reversion.VersionAdmin):
     list_display = ["title", "creator", "posts"]
     search_fields = ["title", "creator__username"]
-    raw_id_fields = ["creator"]
+    raw_id_fields = ["creator", "last_post"]
 
 class ForumPost(reversion.VersionAdmin):
-    list_display = ["text", "thread__title"]
+    list_display = ["creator", "thread", "created"]
     search_fields = ["text", "creator__username"]
     raw_id_fields = ["creator", "thread"]
 

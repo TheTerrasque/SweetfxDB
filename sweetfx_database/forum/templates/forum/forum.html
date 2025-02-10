@@ -19,7 +19,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for thread in forum.forumthread_set.all %}
+            {% for thread in forum.get_threads %}
             <tr>
                 <td><a href="{{ thread.get_absolute_url }}">{{ thread.title }}</a></td>
                 <td>{% cache 600 userlink thread.creator_id %}{% include "shared/user.html" with user=thread.creator %}{% endcache %}</td>

@@ -7,7 +7,6 @@ from . import forms
 from datetime import datetime
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.contenttypes.models import ContentType
-import json
 
 from django.http import Http404
 
@@ -45,10 +44,9 @@ class AddPreset(LoginReq, CreateView):
 
 def search(request):
     query = request.GET.get("query") or request.POST.get("query")
-    data = {}
+    r = {}
     if query:
         games = gamedb.Game.active.filter(title__icontains=query)[:5]
-        r = {}
         r["Games"] = [{"title": x.title, "url": x.get_absolute_url()} for x in games]
         #data = json.dumps(r)
     return JsonResponse(r)

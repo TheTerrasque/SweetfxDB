@@ -4,7 +4,7 @@ from django.template import Template, Context
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.fields import GenericRelation
-
+from django.contrib.auth.models import Permission
 from django.utils.translation import ugettext_lazy as _
 
 from django.urls import reverse
@@ -13,6 +13,8 @@ from django.core.cache import cache
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+from django_registration.signals import user_registered
 # Create your models here.
 
 from . import imageLogic
@@ -275,3 +277,8 @@ def my_handler(sender, **kwargs):
         if instance.comparison_image:
             cache.set(mkey, instance.comparison_image.name)
         instance.make_thumbs()
+
+@receiver(user_registered)
+def add_permission(sender, user, request, **kwargs):
+    permission_object = Permission.objects.get(codename="post_on_forum")
+    user.user_permissions.add(permission_object)

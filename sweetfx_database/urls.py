@@ -4,6 +4,8 @@ from django.views.generic import RedirectView
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
+from sweetfx_database.gamedb.cloudflare_turnstile import RegistrationForm
+from django_registration.backends.one_step.views import RegistrationView
 
 urlpatterns = [
     # Examples:
@@ -19,6 +21,13 @@ urlpatterns = [
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
+    url(
+        'accounts/register/$',
+        RegistrationView.as_view(
+            form_class=RegistrationForm
+        ),
+        name='django_registration_register'
+    ),
     url(r'^accounts/', include('django_registration.backends.one_step.urls')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
     #(r'^account/', include('django_authopenid.urls')),

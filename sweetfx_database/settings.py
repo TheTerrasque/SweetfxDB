@@ -24,7 +24,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': pj('data/data.sqlite3'),                      # Or path to database file if using sqlite3.
+        'NAME': pj('data.sqlite3'),                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -90,7 +90,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'j%zh%perbg4)o))jb*jcx66t6zi1$l_gcohs&amp;l0csk533t05s8'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", 'j%zh%perbg4)o))jb*jcx66t6zi1$l_gcohs&amp;l0csk533t05s8')
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -107,7 +107,6 @@ MIDDLEWARE = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'reversion.middleware.RevisionMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'django_authopenid.middleware.OpenIDMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -149,8 +148,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     "sweetfx_database.api",
-    "rest_framework",
-    "debug_toolbar"
+    "rest_framework"
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -212,6 +210,7 @@ ACCOUNT_ACTIVATION_DAYS=7
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/games/'
+LOGOUT_REDIRECT_URL = "/games/"
 
 AUTH_PROFILE_MODULE = 'users.UserProfile'
 
@@ -259,6 +258,9 @@ LOGGING = {
 }
 
 #WSGI_APPLICATION = 'app.wsgi.application'
+
+CLOUDFLARE_TURNSTILE_SECRET = os.getenv("CLOUDFLARE_TURNSTILE_SECRET")
+CLOUDFLARE_TURNSTILE_SITEKEY = os.getenv("CLOUDFLARE_TURNSTILE_SITEKEY")
 
 try:
     from .settings_local import *

@@ -14,7 +14,7 @@
     </div>
 
     <div class="threadname">{{ thread.title }}</div>
-    {% for post in thread.forumpost_set.all %}
+    {% for post in thread.get_posts %}
         <div class="post">
             <div class="header">
                 <div class="user">{% cache 600 userlink post.creator_id %}{% include "shared/user.html" with user=post.creator %}{% endcache %}</div>
