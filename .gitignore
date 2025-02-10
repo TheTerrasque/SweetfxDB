@@ -11,3 +11,5 @@ env/
 spam_flush.py
 supervisord.log
 supervisord.pid
+todo.txt
+makeandsend.bat

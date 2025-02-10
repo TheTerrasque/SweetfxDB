@@ -1,7 +1,7 @@
 from django.db import models
 from sweetfx_database.users import models as userdb
 from sweetfx_database.gamedb.models import RenderMixin
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 # Create your models here.
 from django.urls import reverse
@@ -142,6 +142,10 @@ def handle_new_forum_post(sender, **kwargs):
 #     forum.threads = forum.forumthread_set.count()
 #     forum.last_thread = instance
 #     forum.save()
+
+@receiver(post_delete, sender=ForumPost)
+def handle_delete_forum_post(sender, instance, **kwargs):
+    instance.thread.update_state()
 
 @receiver(user_registered)
 def add_permission(sender, user, request, **kwargs):
