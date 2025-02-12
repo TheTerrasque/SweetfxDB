@@ -58,7 +58,7 @@ class ResizeImage(BaseImage):
         nw, nh = self.new_size
         ratio = min(float(nw)/cur_w, float(nh)/cur_h)
         new_size = (int(cur_w * ratio), int(cur_h * ratio))
-        self.image = self.image.resize(new_size, Image.ANTIALIAS)
+        self.image = self.image.resize(new_size, Image.LANCZOS)
 
 class CompressImage(BaseImage):
     

@@ -7,6 +7,10 @@ admin.autodiscover()
 from sweetfx_database.gamedb.cloudflare_turnstile import RegistrationForm
 from django_registration.backends.one_step.views import RegistrationView
 
+from django.conf import settings
+from django.urls import re_path
+from django.views.static import serve
+
 urlpatterns = [
     # Examples:
     url(r'^$', RedirectView.as_view(url="/games/"), name='home'),
@@ -33,3 +37,8 @@ urlpatterns = [
     #(r'^account/', include('django_authopenid.urls')),
     url(r'^api/', include('sweetfx_database.api.urls')),
 ]
+
+if settings.DEBUG :
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
+    ]
