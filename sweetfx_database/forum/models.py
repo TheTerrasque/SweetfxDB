@@ -9,6 +9,8 @@ from django.urls import reverse
 from django_registration.signals import user_registered
 from django.contrib.auth.models import Permission
 
+POSTS_VISIBLE_STATES = [0, 1, 3]
+
 class Forum(RenderMixin, models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=100)
@@ -72,7 +74,7 @@ class ForumThread(RenderMixin, models.Model):
         ordering = ['-sorting', "-updated"]
     
     def get_posts(self):
-        return self.forumpost_set.filter(state__in = [0,1])
+        return self.forumpost_set.filter(state__in = POSTS_VISIBLE_STATES)
 
     def update_state(self):
         if self.get_posts().exists():
@@ -96,10 +98,12 @@ class ForumPost(models.Model):
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
     ip = models.CharField(max_length=200, blank=True)
     
+    state_reason = models.TextField(blank=True, default="")
     state = models.IntegerField(choices=[
         (0, "Unchecked"),
         (1, "Visible"),
-        (2, "Spam")
+        (2, "Spam"),
+        (3, "Unsure")
     ], default=0)
 
     def text_short(self):

@@ -262,6 +262,79 @@ LOGGING = {
 CLOUDFLARE_TURNSTILE_SECRET = os.getenv("CLOUDFLARE_TURNSTILE_SECRET")
 CLOUDFLARE_TURNSTILE_SITEKEY = os.getenv("CLOUDFLARE_TURNSTILE_SITEKEY")
 
+OPENAI_BASE_URL = ""
+OPENAI_KEY = ""
+OPENAI_MODEL = ""
+FORUM_RULES = """
+Classify the following content as wanted or not wanted on the forum. Give a reason for your answer.
+
+The forum is for a software called sweetfx and it's successor, reshade. 
+Presets for reshade or sweetfx are sometimes called mods by the users, and are used to enhance the graphics of pc games.
+
+Allowed:
+- Discussions on pc games and different presets for sweetfx, reshade or related programs.
+- Asking about help with creating presets, sharing presets, or asking someone to create a preset for a game.
+- Asking for or talking about a preset for a game.
+- Asking for or talking about a mod or mods for a game.
+- Talking about or discussing specific pc games or hardware, as long as there's no strange links.
+- Asking if there exist a preset or mod for a game, and where to find it.
+- Content discussing the site itself, talk between users, and friendly chat and banter
+- Asking for help with a game, or how to use sweetfx or reshade in a game.
+- Content with links to the official site, or to the official forum.
+- Content with links to the official documentation, or to the official download page.
+- Content discussing the use of reshade or sweetfx in games, legality, and how to install it.
+- Technical support and help with sweetfx and reshade, and specific games. 
+  - This includes asking about dll's like dxgi.dll, d3d9.dll, d3d11.dll, opengl32.dll and so on, as they're used as loaders / injectors for sweetfx and reshade.
+- Content talking about the site, forum and issues, and asking for help.
+- Content discussing different effects and shaders, and how to use them in games.
+- Discussions about pc monitors and graphics cards.
+- Thanking someone for help, or for creating a preset or mod.
+
+Not allowed:
+- Anything promoting or referring to external services not related to the site, reshade or sweetfx.
+- Random bullshit, like list of programs or user experiences with casinos.
+- Talk about non-computer games, like for example football, or other sports.
+- Talk about politics, religion, or other controversial topics.
+- Talk about writing assitance, essay writing or other academic help.
+- Content with many unexplained links, or referring to gambling, casinos, cryptocurrency or advertising, together with any other content that is not related to the forum.
+- Non-english Content are not allowed unless clearly mentioning pc games, sweetfx or reshade.
+- Cracked software, or any other illegal content.
+- Long posts with no clear content, or posts with no clear meaning.
+- Long posts with clear focus on something external to the forum.
+- Linking to external sites with no clear purpose, or linking to sites that are not related to the forum.
+- Otherwise helpful generic content that has a link suddenly appearing with no context in the middle of it.
+
+If unsure or the content is not clear, mark it as maybe and give a reason for your answer. 
+Small, ambiguous posts should be given the benefit of the doubt, unless there's suspicious links.
+"""
+
+DEFAULT_THREAD_PROMPT= """
+{{RULES}}
+
+-------------------
+Forum: {{forum}}
+User: {{user}}
+Thread title: {{title}}
+First post content: {{text}}
+-------------------
+
+Is this thread wanted on the forum? Give the answer in json:
+{ "wanted": "yes|no|maybe", "reason":"<reason>"}
+"""
+
+DEFAULT_POST_PROMPT = """{{RULES}}
+
+Post:
+-------------------
+Forum: {{thread.forum}}
+Thread: {{thread}}
+User: {{thread.user}}
+Message: {{message}}
+-------------------
+Is this post wanted on the forum? Give the answer in json:
+{ "wanted": "yes|no|maybe", "reason":"<reason>"}
+"""
+
 try:
     from .settings_local import *
 except ImportError:
