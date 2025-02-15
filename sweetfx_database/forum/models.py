@@ -9,8 +9,8 @@ from django.urls import reverse
 from django_registration.signals import user_registered
 from django.contrib.auth.models import Permission
 
-POSTS_VISIBLE_STATES = [0, 1, 3, 4]
-POST_SPAM_STATES = [2]
+POSTS_VISIBLE_STATES = [0, 1, 3, 4, 6]
+POST_SPAM_STATES = [2, 5]
 
 class Forum(RenderMixin, models.Model):
     title = models.CharField(max_length=50)
@@ -106,10 +106,12 @@ class ForumPost(models.Model):
         (2, "Spam"),
         (3, "Unsure"),
         (4, "Error"),
+        (5, "Verified spam"),
+        (6, "Mistaken for spam")
     ], default=0)
 
     def text_short(self):
-        return self.text[:100]
+        return self.text[:200]
 
     def update_state(self, newstate=None, reason=None):
         if newstate != None:

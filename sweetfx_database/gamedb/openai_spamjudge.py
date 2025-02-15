@@ -51,8 +51,8 @@ def judge_post(post: fm.ForumPost):
     except Exception as e:
         post.update_state(4, str(e))
     if post.state in fm.POST_SPAM_STATES:
-        num_spams = fm.ForumPost.objects.filter(state__in=fm.POST_SPAM_STATES).count()
-        num_nonspams = fm.ForumPost.objects.filter(state__in=fm.POSTS_VISIBLE_STATES).count()
+        num_spams = fm.ForumPost.objects.filter(state__in=fm.POST_SPAM_STATES, creator=post.creator).count()
+        num_nonspams = fm.ForumPost.objects.filter(state__in=fm.POSTS_VISIBLE_STATES, creator=post.creator).count()
         if num_spams > num_nonspams:
             remove_user_posting_permissions(post.creator)
             return 2

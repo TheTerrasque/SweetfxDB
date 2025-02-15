@@ -13,9 +13,17 @@ def mark_as_spam(modeladmin, request, queryset):
     for post in queryset:
         post.update_state(2)
 
-def mark_as_verified(modeladmin, request, queryset):
+def mark_as_visible(modeladmin, request, queryset):
     for post in queryset:
         post.update_state(1)
+
+def mark_as_verified_spam(modeladmin, request, queryset):
+    for post in queryset:
+        post.update_state(5)
+
+def mark_as_mistaken_spam(modeladmin, request, queryset):
+    for post in queryset:
+        post.update_state(6)
 
 class ForumPost(reversion.VersionAdmin):
     list_display = ["creator", "thread","text_short", "created", "state"]
@@ -24,7 +32,7 @@ class ForumPost(reversion.VersionAdmin):
     raw_id_fields = ["creator", "thread"]
     date_hierarchy = "created"
     list_filter = ["state"]
-    actions = [mark_as_spam, mark_as_verified]
+    actions = [ mark_as_verified_spam, mark_as_mistaken_spam, mark_as_spam, mark_as_visible]
 
 admin.site.register(M.Forum)
 admin.site.register(M.ForumThread, ForumThread)
