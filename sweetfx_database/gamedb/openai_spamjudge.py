@@ -55,3 +55,5 @@ def judge_post(post: fm.ForumPost):
         num_nonspams = fm.ForumPost.objects.filter(state__in=fm.POSTS_VISIBLE_STATES).count()
         if num_spams > num_nonspams:
             remove_user_posting_permissions(post.creator)
+            return 2
+        return 1

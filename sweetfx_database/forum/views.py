@@ -33,6 +33,14 @@ class EditPost(LoginReq, UpdateView):
         base_qs = super(EditPost, self).get_queryset()
         return base_qs.filter(creator=self.request.user)
 
+    def form_valid(self, form):
+        # First, let the superclass method handle the form saving.
+        response = super().form_valid(form)
+        # Then, update the post's state attribute to 0.
+        self.object.state = 0
+        self.object.save(update_fields=['state'])
+        return response
+
 class NewForumThread(ForumPermissionReq, CreateView):
     form_class = forms.NewThreadForm
     template_name = "forum/new_thread.html"

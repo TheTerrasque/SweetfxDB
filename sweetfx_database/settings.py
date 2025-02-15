@@ -262,9 +262,9 @@ LOGGING = {
 CLOUDFLARE_TURNSTILE_SECRET = os.getenv("CLOUDFLARE_TURNSTILE_SECRET")
 CLOUDFLARE_TURNSTILE_SITEKEY = os.getenv("CLOUDFLARE_TURNSTILE_SITEKEY")
 
-OPENAI_BASE_URL = ""
-OPENAI_KEY = ""
-OPENAI_MODEL = ""
+OPENAI_BASE_URL = os.getenv("SFX_OPENAI_BASE_URL", "")
+OPENAI_KEY = os.getenv("SFX_OPENAI_KEY", "")
+OPENAI_MODEL = os.getenv("SFX_OPENAI_MODEL", "")
 FORUM_RULES = """
 Classify the following content as wanted or not wanted on the forum. Give a reason for your answer.
 
