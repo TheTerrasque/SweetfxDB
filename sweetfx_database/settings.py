@@ -312,27 +312,25 @@ DEFAULT_THREAD_PROMPT= """
 {{RULES}}
 
 -------------------
-Forum: {{forum}}
-User: {{user}}
-Thread title: {{title}}
+Forum: {{thread.forum}}
+User: {{creator}}
+Thread title: {{post.thread}}
 First post content: {{text}}
 -------------------
 
-Is this thread wanted on the forum? Give the answer in json:
-{ "wanted": "yes|no|maybe", "reason":"<reason>"}
+Is this thread wanted on the forum? 
 """
 
 DEFAULT_POST_PROMPT = """{{RULES}}
 
 Post:
 -------------------
-Forum: {{thread.forum}}
-Thread: {{thread}}
-User: {{thread.user}}
-Message: {{message}}
+Forum: {{post.thread.forum}}
+Thread: {{post.thread}}
+User: {{post.creator}}
+Message: {{post.text}}
 -------------------
-Is this post wanted on the forum? Give the answer in json:
-{ "wanted": "yes|no|maybe", "reason":"<reason>"}
+Is this post wanted on the forum?
 """
 
 try:
