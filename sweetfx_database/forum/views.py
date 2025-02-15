@@ -4,7 +4,7 @@ from sweetfx_database.gamedb.mixins import LoginReq, PaginateMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from . import forms
 from django.utils.html import escape
-
+from django.utils import timezone
 
 class ForumPermissionReq(PermissionRequiredMixin):
     permission_required = "forum.post_on_forum"
@@ -38,7 +38,8 @@ class EditPost(LoginReq, UpdateView):
         response = super().form_valid(form)
         # Then, update the post's state attribute to 0.
         self.object.state = 0
-        self.object.save(update_fields=['state'])
+        self.object.updated = timezone.now()
+        self.object.save(update_fields=['state', "updated"])
         return response
 
 class NewForumThread(ForumPermissionReq, CreateView):

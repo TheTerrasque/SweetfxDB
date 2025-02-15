@@ -96,7 +96,7 @@ class ForumPost(models.Model):
     creator = models.ForeignKey(userdb.User, on_delete=models.CASCADE)
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    updated = models.DateTimeField(blank=True, null=True)
     ip = models.CharField(max_length=200, blank=True)
     
     state_reason = models.TextField(blank=True, default="")

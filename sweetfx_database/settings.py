@@ -328,7 +328,7 @@ Post:
 Forum: {{post.thread.forum}}
 Thread: {{post.thread}}
 User: {{post.creator}}
-Message: {{post.text}}
+Text: {{post.text}}
 -------------------
 Is this post wanted on the forum?
 """
