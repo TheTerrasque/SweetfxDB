@@ -5,6 +5,7 @@ from reversion import admin as reversion
 class Preset(reversion.VersionAdmin):
     list_display = ["title", "creator", "game"]
     list_filter = ["visible"]
+    date_hierarchy = "added"
     search_fields = ["title", "creator__username", "game__title"]
     raw_id_fields = ["creator", "game"]
 
@@ -23,6 +24,7 @@ class Screenshot(reversion.VersionAdmin):
 class Game(reversion.VersionAdmin):
     list_display = ["title", "creator"]
     list_filter = ["visible"]
+    date_hierarchy = "added"
     search_fields = ["title", "creator__username"]
     raw_id_fields = ["creator"]
 

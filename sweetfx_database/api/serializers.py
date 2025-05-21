@@ -46,7 +46,7 @@ class PresetSerializer(serializers.HyperlinkedModelSerializer):
 
 class GameSerializer(serializers.HyperlinkedModelSerializer):
     creator = serializers.Field(source="creator.username")
-    presets = miniPresetSerializer(many=True, source="preset_set")
+    presets = miniPresetSerializer(many=True, source="get_presets")
     
     weblink = serializers.Field(source='get_absolute_url')
     class Meta:
