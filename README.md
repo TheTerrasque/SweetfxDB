@@ -2,13 +2,13 @@
 
 ## Project Overview
 
-SweetFX is a universal image improvement and tweaking mod for PC games. It allows users to apply a suite of post-processing shader effects to their games, such as sharpening, color correction, and anti-aliasing, to enhance the visual experience.
+SweetFX, ReShade, and similar tools are universal image improvement and tweaking mods for PC games. They allow users to apply a suite of post-processing shader effects to their games, such as sharpening, color correction, and anti-aliasing, to enhance the visual experience.
 
-sfx.thelazy.net is a web application that serves as a comprehensive database for SweetFX presets. This platform enables users to easily browse, download, and share customized SweetFX settings for a wide variety of games. Key features include:
+sfx.thelazy.net is a web application that serves as a comprehensive database for presets for SweetFX, ReShade, and similar graphics modification tools. This platform enables users to easily browse, download, and share customized settings for a wide variety of games. Key features include:
 
-*   **Preset Database:** A vast collection of user-submitted SweetFX presets, categorized by game.
-*   **Game List:** An extensive list of games compatible with SweetFX, making it easy to find presets for specific titles.
-*   **Forum:** A community forum for users to discuss presets, share tips, and seek help.
+*   **Preset Database:** A vast collection of user-submitted presets for tools like SweetFX and ReShade, categorized by game.
+*   **Game List:** An extensive list of games compatible with these modification tools, making it easy to find presets for specific titles.
+*   **Forum:** A community forum for users to discuss presets, share tips, and seek help related to these graphics modification tools.
 *   **Downloads:** A system for managing preset downloads and tracking popular settings.
 
 Code for sfx.thelazy.net
@@ -28,8 +28,7 @@ Code for sfx.thelazy.net
     docker-compose up --build
     ```
 2.  **Access the application:**
-    Open your web browser and navigate to `http://localhost:8124/`.
-    (Note: `$dockerhost` typically refers to `localhost` or `127.0.0.1`).
+    Open your web browser and navigate to `http://localhost:8124/` (or `http://127.0.0.1:8124/`).
 3.  **Create an admin user (optional):**
     If you need an admin user, run the following command in a separate terminal:
     ```bash
