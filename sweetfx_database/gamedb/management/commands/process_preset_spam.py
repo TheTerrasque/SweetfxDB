@@ -9,7 +9,7 @@ from termcolor import colored
 TYPES = {
     0: colored("Unchecked", "cyan"),
     1: colored("OK", "light_green"),
-    2: colored("SPAM", "light_red"),
+    2: colored("Suspected Spam", "light_red"), # Changed from SPAM
     3: colored("Unsure", "light_yellow"),
     4: colored("ERROR", "light_red", "on_yellow", attrs=["bold"]),
     5: colored("Verified SPAM", "red", attrs=["bold"]),

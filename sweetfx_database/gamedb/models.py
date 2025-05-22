@@ -33,7 +33,7 @@ POST_SPAM_STATES = [2, 5]
 SPAM_STATE_CHOICES = (
     (0, "Unchecked"),
     (1, "Visible"),
-    (2, "Spam"),
+    (2, "Suspected Spam"),
     (3, "Unsure"),
     (4, "Error"),
     (5, "Verified spam"),

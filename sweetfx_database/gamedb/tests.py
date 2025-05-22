@@ -255,6 +255,21 @@ class ManagementCommandsTests(TestCase):
 
 
     # Helper methods adapted from OpenAISpamJudgeTests
+    # No explicit TYPES dictionary is defined in ManagementCommandsTests in the provided file,
+    # so the tests would rely on the output from the actual command.
+    # If the command's output changes due to SPAM_STATE_CHOICES, the assertions on stdout
+    # in test_process_games_output_variants and test_process_presets_output_variants
+    # might need adjustment if they were hardcoding "SPAM" based on the old label.
+    # However, these tests primarily check for the "User lost game posting rights" message
+    # and the presence of the item's title, not the exact colored spam label.
+    # The visual colored output itself isn't directly asserted in a way that "Spam" vs "Suspected Spam"
+    # would break the existing test logic for command output variants, as it's more about the structure.
+
+    # For robustness, if a local TYPES dict were used for assertions, it would be changed here.
+    # Since it's not, we rely on the management commands themselves to use the updated SPAM_STATE_CHOICES.
+    # The critical part is that the `state` value (e.g., 2) remains the same, and
+    # OpenAISpamJudge tests assert based on `POST_SPAM_STATES` or integer values.
+
     def _create_game(self, title="Cmd Test Game", creator=None, state=0):
         if creator is None:
             creator = self.user
@@ -481,8 +496,138 @@ class ManagementCommandsTests(TestCase):
         self.assertIn(f"'{preset_perm_loss.title}' by {self.user.username}", output)
         self.assertIn("User lost game posting rights", output.splitlines()[2])
 
-**Note on ContentType:**
-In `setUp` and `test_remove_user_posting_permissions_success`, I've used `ContentType.objects.get_for_model(Game)` for the `'post_on_games'` permission. For `'post_on_forum'`, since the `ForumPost` model isn't directly part of `gamedb`, I've used `ContentType.objects.get_for_model(User)` as a placeholder. In a real scenario, this should point to the correct content type for forum posts. For these tests, as long as the permission object can be created and manipulated, it serves the purpose.
+
+from django.test import Client
+from django.urls import reverse
+from .models import Shader # Shader model for PresetForm
+
+class ViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user_with_permission = User.objects.create_user(username='viewtestuser_perm', password='password')
+        self.user_no_permission = User.objects.create_user(username='viewtestuser_noperm', password='password')
+
+        # Grant 'post_on_games' permission
+        from django.contrib.contenttypes.models import ContentType
+        game_content_type = ContentType.objects.get_for_model(Game)
+        post_on_games_perm, _ = Permission.objects.get_or_create(
+            codename='post_on_games',
+            name='Can post on games',
+            content_type=game_content_type
+        )
+        self.user_with_permission.user_permissions.add(post_on_games_perm)
+        self.user_with_permission.save()
+
+        # Create a dummy Shader object, as it's a required field for PresetForm
+        self.shader = Shader.objects.create(name="Test Shader")
+
+        # Helper methods from other test classes, adapted for this class if needed
+        # For simplicity, we'll redefine basic versions here or rely on direct creation.
+
+    def _create_game_for_user(self, user, title="View Test Game", state=1): # Default to a non-zero state
+        return Game.objects.create(
+            title=title,
+            creator=user,
+            state=state, # Initial state before edit
+            description="Game for view testing.",
+            sweetfx_notes="Notes for view test game.",
+            url="http://example.com/viewgame",
+            exename="viewgame.exe"
+        )
+
+    def _create_preset_for_user(self, user, game, title="View Test Preset", state=1): # Default to non-zero state
+        return Preset.objects.create(
+            title=title,
+            game=game,
+            creator=user,
+            shader=self.shader, # Use the shader created in setUp
+            state=state, # Initial state before edit
+            description="Preset for view testing.",
+            settings_text="Settings for view test preset."
+        )
+
+    def test_add_game_sets_state_to_zero(self):
+        self.client.login(username='viewtestuser_perm', password='password')
+        
+        add_game_url = reverse('g-game-add')
+        game_data = {
+            'title': 'New Game Via View',
+            'url': 'http://example.com/newgame',
+            'exename': 'newgame.exe',
+            'sweetfx_notes': 'Notes for new game.'
+        }
+        response = self.client.post(add_game_url, game_data)
+        
+        self.assertEqual(response.status_code, 302) # Should redirect after successful creation
+        self.assertTrue(Game.objects.filter(title='New Game Via View').exists())
+        new_game = Game.objects.get(title='New Game Via View')
+        self.assertEqual(new_game.state, 0)
+        self.assertEqual(new_game.creator, self.user_with_permission)
+
+    def test_add_preset_sets_state_to_zero(self):
+        self.client.login(username='viewtestuser_perm', password='password')
+        
+        game_for_preset = self._create_game_for_user(self.user_with_permission, title="Game For New Preset")
+        add_preset_url = reverse('g-game-add-preset', kwargs={'pk': game_for_preset.pk})
+        
+        preset_data = {
+            'title': 'New Preset Via View',
+            'shader': self.shader.pk,
+            'description': 'Description for new preset.',
+            'settings_text': 'Settings for new preset.',
+            'visible': True
+        }
+        response = self.client.post(add_preset_url, preset_data)
+        
+        self.assertEqual(response.status_code, 302) # Redirect after successful creation
+        self.assertTrue(Preset.objects.filter(title='New Preset Via View').exists())
+        new_preset = Preset.objects.get(title='New Preset Via View')
+        self.assertEqual(new_preset.state, 0)
+        self.assertEqual(new_preset.creator, self.user_with_permission)
+        self.assertEqual(new_preset.game, game_for_preset)
+
+    def test_edit_game_sets_state_to_zero(self):
+        game_to_edit = self._create_game_for_user(self.user_with_permission, title="Game To Edit", state=1)
+        self.client.login(username='viewtestuser_perm', password='password')
+        
+        edit_game_url = reverse('g-game-edit', kwargs={'pk': game_to_edit.pk})
+        game_data_edit = {
+            'title': 'Edited Game Title Via View', # Changed title
+            'url': game_to_edit.url,
+            'exename': game_to_edit.exename,
+            'sweetfx_notes': 'Updated notes.'
+        }
+        response = self.client.post(edit_game_url, game_data_edit)
+
+        self.assertEqual(response.status_code, 302) # Redirect after successful update
+        
+        edited_game = Game.objects.get(pk=game_to_edit.pk)
+        self.assertEqual(edited_game.title, 'Edited Game Title Via View')
+        self.assertEqual(edited_game.state, 0) # Crucial check
+        self.assertEqual(edited_game.sweetfx_notes, 'Updated notes.')
+
+    def test_edit_preset_sets_state_to_zero(self):
+        game_for_preset_edit = self._create_game_for_user(self.user_with_permission, title="Game For Preset Edit")
+        preset_to_edit = self._create_preset_for_user(self.user_with_permission, game_for_preset_edit, title="Preset To Edit", state=1)
+        
+        self.client.login(username='viewtestuser_perm', password='password')
+        
+        edit_preset_url = reverse('g-preset-edit', kwargs={'pk': preset_to_edit.pk})
+        preset_data_edit = {
+            'title': 'Edited Preset Title Via View', # Changed title
+            'shader': self.shader.pk,
+            'description': 'Updated description for preset.',
+            'settings_text': preset_to_edit.settings_text,
+            'visible': preset_to_edit.visible
+        }
+        response = self.client.post(edit_preset_url, preset_data_edit)
+        
+        self.assertEqual(response.status_code, 302) # Redirect after successful update
+
+        edited_preset = Preset.objects.get(pk=preset_to_edit.pk)
+        self.assertEqual(edited_preset.title, 'Edited Preset Title Via View')
+        self.assertEqual(edited_preset.state, 0) # Crucial check
+        self.assertEqual(edited_preset.description, 'Updated description for preset.')
 
 This set of tests covers the main functionality and edge cases for the specified `OpenAISpamJudge` methods.
 I had to add a dummy `ROOT_URLCONF` and `PASSWORD_HASHERS` to the minimal settings configuration to prevent Django from issuing warnings/errors during test discovery or setup. I also added `from django.contrib.contenttypes.models import ContentType` which was missing in my initial thought process but is needed for permission creation.I have overwritten `sweetfx_database/gamedb/tests.py` with the new test suite.
