@@ -36,6 +36,7 @@ class AddPreset(GamePermissionReq, CreateView):
         game = gamedb.Game.objects.get(id=mypk)
         self.object.game = game
         self.object.creator = self.request.user
+        self.object.state = 0
         return super(AddPreset, self).form_valid(form)
 
 def search(request):
@@ -55,6 +56,7 @@ class AddGame(GamePermissionReq, CreateView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.creator = self.request.user
+        self.object.state = 0
         return super(AddGame, self).form_valid(form)
 
 class AddScreenshot(GamePermissionReq, CreateView):
@@ -115,6 +117,7 @@ class EditPreset(LoginReq, UpdateView):
 
     def form_valid(self, form):
         form.instance.updated = datetime.now()
+        form.instance.state = 0
         for fav in form.instance.favorites.all():
             fav.user.userprofile.add_alert(u"Preset %s was updated" % form.instance.render())
         return super(EditPreset, self).form_valid(form)
@@ -132,6 +135,10 @@ class EditScreenshot(LoginReq, UpdateView):
 class EditGame(LoginReq, UpdateView):
     template_name="gamedb/generic_form.html"
     form_class = forms.GameForm
+
+    def form_valid(self, form):
+        form.instance.state = 0
+        return super(EditGame, self).form_valid(form)
 
     def get_queryset(self):
         return gamedb.Game.objects.filter(creator=self.request.user)

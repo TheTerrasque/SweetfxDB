@@ -20,6 +20,26 @@ from django_registration.signals import user_registered
 from . import imageLogic
 import os
 
+# Spam states for user generated content
+# (0, "Unchecked")
+# (1, "Visible")
+# (2, "Spam")
+# (3, "Unsure")
+# (4, "Error")
+# (5, "Verified spam")
+# (6, "Mistaken for spam")
+POSTS_VISIBLE_STATES = [0, 1, 3, 4, 6]
+POST_SPAM_STATES = [2, 5]
+SPAM_STATE_CHOICES = (
+    (0, "Unchecked"),
+    (1, "Visible"),
+    (2, "Spam"),
+    (3, "Unsure"),
+    (4, "Error"),
+    (5, "Verified spam"),
+    (6, "Mistaken for spam"),
+)
+
 #Not in use any more
 SWEETFX_VERSION = (
 #    (7, "1.6"),
@@ -74,6 +94,9 @@ class Game(RenderMixin, models.Model):
 
     preset_count = models.IntegerField(default=0)
 
+    state = models.IntegerField(choices=SPAM_STATE_CHOICES, default=0)
+    state_reason = models.TextField(blank=True, default="")
+
     comments = GenericRelation(UserComment)
 
     active = ActiveManager()
@@ -87,6 +110,13 @@ class Game(RenderMixin, models.Model):
 
     def get_presets(self):
         return self.preset_set.filter(visible=True)
+
+    def update_state(self, newstate=None, reason=None):
+        if newstate is not None:
+            self.state = newstate
+            if reason:
+                self.state_reason = reason
+            self.save()
 
     def __str__(self):
         return self.title
@@ -134,6 +164,10 @@ class Preset(RenderMixin, models.Model):
 
     downloads = models.IntegerField(default=0, db_index=True)
     screenshot_count = models.IntegerField(default=0)
+
+    state = models.IntegerField(choices=SPAM_STATE_CHOICES, default=0)
+    state_reason = models.TextField(blank=True, default="")
+
     comments = GenericRelation(UserComment)
     
     def update_screenshot_count(self):
@@ -147,6 +181,13 @@ class Preset(RenderMixin, models.Model):
 
     def is_active(self, user=None):
         return self.visible
+
+    def update_state(self, newstate=None, reason=None):
+        if newstate is not None:
+            self.state = newstate
+            if reason:
+                self.state_reason = reason
+            self.save()
 
     def __str__(self):
         return self.title
