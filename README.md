@@ -81,6 +81,4 @@ If you'd like to contribute code:
 
 ## License
 
-This project does not currently have a license. This means that standard copyright laws apply, and there are no explicit permissions granted for use, modification, or distribution of the code.
-
-It is recommended to add a LICENSE file to the repository to clarify how others can use, modify, and distribute the code. Common open-source licenses include the [MIT License](https://opensource.org/licenses/MIT) and the [Apache License 2.0](https://opensource.org/licenses/Apache-2.0), among others. Choosing a license helps ensure that both the contributors and users understand their rights and obligations.
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for the full license text.
