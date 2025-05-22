@@ -3,8 +3,8 @@
 {% block main %}
     <div id="breads">
         <ul class="horizmenu">
-            <li><a href="{% url g-games-list %}">Games list</a></li>
-            <li><a href="{% url g-preset-popular-list %}">Popular presets</a></li>
+            <li><a href="{% url 'g-games-list' %}">Games list</a></li>
+            <li><a href="{% url 'g-preset-popular-list' %}">Popular presets</a></li>
         </ul>
     </div>
     {% include "shared/preset_list.html" with presets=object_list %}

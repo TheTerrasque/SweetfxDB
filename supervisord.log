@@ -1,0 +1,6 @@
+2019-10-10 19:14:50,900 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2019-10-10 19:14:50,911 INFO supervisord started with pid 7
+2019-10-10 19:14:51,917 INFO spawned: 'nginx' with pid 10
+2019-10-10 19:14:51,924 INFO spawned: 'uwsgi' with pid 11
+2019-10-10 19:14:53,033 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2019-10-10 19:14:53,034 INFO success: uwsgi entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

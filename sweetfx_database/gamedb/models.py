@@ -2,16 +2,22 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.template import Template, Context
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.auth.models import Permission
 from django.utils.translation import ugettext_lazy as _
+
+from django.urls import reverse
 
 from django.core.cache import cache
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+from django_registration.signals import user_registered
 # Create your models here.
 
-import imageLogic
+from . import imageLogic
 import os
 
 #Not in use any more
@@ -39,20 +45,20 @@ class RenderMixin(object):
         return render_template(self.template, {"object": self})
 
 class UserComment(models.Model):
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.TextField()
     added = models.DateTimeField(auto_now_add=True)
     visible = models.BooleanField(default=True, blank=True)
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField(db_index=True)
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s comment by %s" % (self.content_type, self.creator)
 
     def get_text_start(self):
-        return self.comment[:20]
+        return self.comment[:50]
 
     class Meta:
         ordering = ["-id"]
@@ -61,14 +67,14 @@ class Game(RenderMixin, models.Model):
     title = models.CharField(db_index=True, max_length=50, help_text= _("The name of the game"))
     url = models.URLField(blank=True, help_text= _("Home page for the game"))
     exename = models.CharField(max_length=20, blank = True, help_text= _("Name of the executable for this game"))
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
     added = models.DateField(auto_now_add=True)
     visible = models.BooleanField(default=True, blank=True, db_index=True)
     sweetfx_notes = models.TextField(blank=True, help_text= _("Any general SweetFX notes about this game"))
 
     preset_count = models.IntegerField(default=0)
 
-    comments = generic.GenericRelation(UserComment)
+    comments = GenericRelation(UserComment)
 
     active = ActiveManager()
     objects = models.Manager()
@@ -82,32 +88,33 @@ class Game(RenderMixin, models.Model):
     def get_presets(self):
         return self.preset_set.filter(visible=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
         ordering = ["title"]
+        permissions = [
+            ("post_on_games", "Can post on games"),
+        ]
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('g-game-detail', [str(self.id)])
+        return reverse('g-game-detail', args=[str(self.id)])
 
 class Shader(RenderMixin, models.Model):
     
     name = models.CharField(max_length=40)
     url = models.URLField(blank=True)
     description = models.TextField(blank=True)
-    download = models.ForeignKey("downloads.DownloadFile", null=True, blank = True)
+    download = models.ForeignKey("downloads.DownloadFile", null=True, blank = True, on_delete=models.CASCADE)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:
         ordering = ["name"]
-    
-    @models.permalink
+
     def get_absolute_url(self):
-        return ('g-shader-detail', [str(self.id)])
+        return reverse('g-shader-detail', args=[str(self.id)])
     
 class Preset(RenderMixin, models.Model):
     title = models.CharField(max_length=40, help_text= _("The name of the preset"))
@@ -115,19 +122,19 @@ class Preset(RenderMixin, models.Model):
     updated = models.DateTimeField(blank=True, null=True)
     description = models.TextField(blank=True)
     settings_text = models.TextField(help_text= _("The actual preset settings"))
-    creator = models.ForeignKey(User)
-    game = models.ForeignKey(Game)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     visible = models.BooleanField(db_index=True, default=True, blank=True, help_text="Display the preset on the game page")
     active = ActiveManager()
     objects = models.Manager()
 
     #sweetfx_version = models.IntegerField(choices=SWEETFX_VERSION, help_text= _("The SweetFX version the config is for"))
-    shader = models.ForeignKey(Shader, null=True)
+    shader = models.ForeignKey(Shader, null=True, on_delete=models.CASCADE)
 
     downloads = models.IntegerField(default=0, db_index=True)
     screenshot_count = models.IntegerField(default=0)
-    comments = generic.GenericRelation(UserComment)
+    comments = GenericRelation(UserComment)
     
     def update_screenshot_count(self):
         self.screenshot_count = self.get_screenshots().count()
@@ -141,15 +148,14 @@ class Preset(RenderMixin, models.Model):
     def is_active(self, user=None):
         return self.visible
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
         ordering = ["title", "id"]
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('g-preset-detail', [str(self.id)])
+        return reverse('g-preset-detail', args=[str(self.id)])
 
 class PresetScreenshot(RenderMixin, models.Model):
     template = """<a href="{{ object.get_absolute_url }}">
@@ -164,12 +170,12 @@ class PresetScreenshot(RenderMixin, models.Model):
             </div>
         </a>"""
 
-    preset = models.ForeignKey(Preset)
-    image = models.ImageField(verbose_name = _("SweetFX image"), upload_to="presetscreenshots", height_field="image_height", width_field="image_width", help_text= _("The main image, the screenshot itself"))
+    preset = models.ForeignKey(Preset, on_delete=models.CASCADE)
+    image = models.ImageField(verbose_name = _("SweetFX image"), upload_to="presetscreenshots/%Y/%m/%d/", height_field="image_height", width_field="image_width", help_text= _("The main image, the screenshot itself"))
     image_height = models.IntegerField(default=0)
     image_width = models.IntegerField(default=0)
 
-    comparison_image = models.ImageField(upload_to="presetscreenshotscompare", blank=True, null = True, help_text= _("Optional comparison image, where SweetFX is OFF"))
+    comparison_image = models.ImageField(upload_to="presetscreenshotscompare/%Y/%m/%d/", blank=True, null = True, help_text= _("Optional comparison image, where SweetFX is OFF"))
 
     SFX_STATES = (
         (2, _("Split screen")),
@@ -184,13 +190,21 @@ class PresetScreenshot(RenderMixin, models.Model):
     active = ActiveManager()
     objects = models.Manager()
 
-    medium_thumb = models.ImageField(upload_to="medthumb")
+    medium_thumb = models.ImageField(upload_to="medthumb/%Y/%m/%d/")
 
-    medium_thumb_compared = models.ImageField(upload_to="medthumb", blank = True, null = True)
+    medium_thumb_compared = models.ImageField(upload_to="medthumb/%Y/%m/%d/", blank = True, null = True)
 
-    small_thumb = models.ImageField(upload_to="smallthumb")
+    small_thumb = models.ImageField(upload_to="smallthumb/%Y/%m/%d/")
     created = models.DateField(auto_now_add=True)
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    optimized = models.BooleanField(default=False)
+
+    def optimize(self):
+        if self.image.path.lower().endswith(".png"):
+            imageLogic.optimize_png(self.image.path)
+            self.optimized = True
+            self.save()
 
     def compress_main_image(self):
         path = self.image.path
@@ -221,11 +235,11 @@ class PresetScreenshot(RenderMixin, models.Model):
         self.compress_main_image()
         self.compress_comparison_image()
 
-    comments = generic.GenericRelation(UserComment)
+    comments = GenericRelation(UserComment)
     def get_comments(self):
         return self.comments.filter(visible=True)
         
-    def __unicode__(self):
+    def __str__(self):
         return u"Screenshot - %s (%s)" % (self.preset, self.preset.game)
 
     class Meta:
@@ -236,9 +250,8 @@ class PresetScreenshot(RenderMixin, models.Model):
             return "Comparison"
         return self.get_sweetfx_state_display()
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('g-screenshot-detail', [str(self.id)])
+        return reverse('g-screenshot-detail', args=[str(self.id)])
 
 def render_template(templatestr, contextdict):
     t = Template(templatestr)
@@ -267,3 +280,8 @@ def my_handler(sender, **kwargs):
         if instance.comparison_image:
             cache.set(mkey, instance.comparison_image.name)
         instance.make_thumbs()
+
+@receiver(user_registered)
+def add_permission(sender, user, request, **kwargs):
+    permission_object = Permission.objects.get(codename="post_on_games")
+    user.user_permissions.add(permission_object)

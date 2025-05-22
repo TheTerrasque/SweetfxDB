@@ -2,11 +2,7 @@
 <html>
 <head>
     <title>{%block title%}SweetFX Settings Database{% endblock %}</title>
-    {% if user.is_authenticated and user.get_profile.css %}
-        <link rel="stylesheet" href="{{ user.get_profile.css }}" />
-    {% else %}
-        <link rel="stylesheet" href="{{ CSSURL}}" />
-    {% endif %}
+    <link rel="stylesheet" href="{{ CSSURL}}" />
     <link rel="shortcut icon" href="/static/logo.png" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     {%block head%}{% endblock %}
@@ -18,20 +14,20 @@
         </div>
         <ul class="horizmenu">
             <li>
-                <a href="{% url g-games-list %}">Games list</a>
-                <a href="{% url silly-home %}">Silly stuff</a>
-                <a href="{% url forum-main %}">Forum</a>
-                <a href="{% url downloads-main %}">Downloads</a>
-                <a href="http://store.overwolf.com/app/aRestless-SweetFX-Preset-Selector">Overwolf Ingame app</a>
+                <a href="{% url 'g-games-list' %}">Games list</a>
+                <a href="{% url 'silly-home' %}">Silly stuff</a>
+                <a href="{% url 'forum-main' %}">Forum</a>
+                <a href="{% url 'downloads-main' %}">Downloads</a>
+                <a href="https://discord.gg/SwuyHvY">Discord chat</a>
             </li>
         </ul>
         <ul class="horizmenu usermenu">
             {% if user.is_authenticated %}
                 <li>
-                    <a href="{% url user-detail user.username %}">{{ user }}</a>
+                    <a href="{% url 'user-detail' user.username %}">{{ user }}</a>
                 </li>
                 <li>
-                    <a href="{% url user-alerts %}" {% if user.get_profile.alerts%}class="alerttext"{% endif %}>Alerts</a>
+                    <a href="{% url 'user-alerts' %}" {% if user.userprofile.alerts%}class="alerttext"{% endif %}>Alerts</a>
                 </li>
                 <li>
                     <a href="/accounts/logout/">Log out</a>

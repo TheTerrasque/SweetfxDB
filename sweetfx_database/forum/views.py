@@ -1,8 +1,14 @@
-import models as forumdb
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
-from sweetfx_database.gamedb.views import LoginReq, PaginateMixin
-import forms
+from . import models as forumdb
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from sweetfx_database.gamedb.mixins import LoginReq, PaginateMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from . import forms
 from django.utils.html import escape
+from django.utils import timezone
+
+class ForumPermissionReq(PermissionRequiredMixin):
+    permission_required = "forum.post_on_forum"
+    permission_denied_message = "Posting is disabled your user. Contact Terrasque on Discord to enable posting for your account."
 
 class ForumList(PaginateMixin, ListView):
     template_name = "forum/index.html"
@@ -27,7 +33,16 @@ class EditPost(LoginReq, UpdateView):
         base_qs = super(EditPost, self).get_queryset()
         return base_qs.filter(creator=self.request.user)
 
-class NewForumThread(LoginReq, CreateView):
+    def form_valid(self, form):
+        # First, let the superclass method handle the form saving.
+        response = super().form_valid(form)
+        # Then, update the post's state attribute to 0.
+        self.object.state = 0
+        self.object.updated = timezone.now()
+        self.object.save(update_fields=['state', "updated"])
+        return response
+
+class NewForumThread(ForumPermissionReq, CreateView):
     form_class = forms.NewThreadForm
     template_name = "forum/new_thread.html"
     
@@ -55,7 +70,7 @@ class NewForumThread(LoginReq, CreateView):
         
         return x
 
-class NewForumPost(LoginReq, CreateView):
+class NewForumPost(ForumPermissionReq, CreateView):
     form_class = forms.NewPostForm
     template_name = "forum/new_thread.html"
     
@@ -65,7 +80,7 @@ class NewForumPost(LoginReq, CreateView):
         
         if self.request.user != thread.creator:
             msg = "Someone created a new post on thread : <a href='%s'>%s</a>" % (thread.get_absolute_url(), escape(thread))
-            thread.creator.get_profile().add_alert(msg)
+            thread.creator.userprofile.add_alert(msg)
         
         self.object = form.save(commit=False)
         self.object.creator = self.request.user

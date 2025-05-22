@@ -1,7 +1,7 @@
 from sweetfx_database.gamedb import models as gamedb
 from sweetfx_database.users import models as userdb
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView
-import forms
+from . import forms
 
 from django.shortcuts import redirect
 
@@ -21,6 +21,7 @@ class AboutView(TemplateView):
 class UserDetail(DetailView):
     model = gamedb.User
     slug_field = "username"
+    context_object_name = "object"
     template_name = "users/user_detail.html"
 
 
@@ -34,7 +35,7 @@ class UserAlerts(LoginReq, ListView):
     template_name = "users/alerts.html"
     
     def get_queryset(self):
-        p=self.request.user.get_profile()
+        p=self.request.user.userprofile
         p.alerts = False
         p.save()
         return userdb.Alert.objects.filter(owner=self.request.user)
@@ -44,7 +45,16 @@ class UserProfile(LoginReq, UpdateView):
     form_class = forms.ProfileForm
 
     def get_object(self):
-        return self.request.user.get_profile()
+        return self.request.user.userprofile
+
+@login_required
+def remove_user(request):
+    uid = request.POST.get("userid")
+    if request.method=="POST" and request.user.is_superuser and uid:
+        user = userdb.User.objects.get(id=uid)
+        user.delete()
+    return redirect("/")
+
 
 @login_required
 def remove_preset_from_favorite(request):

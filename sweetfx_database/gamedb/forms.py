@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-import models as M
+from . import models as M
 
 class RequiredForm(ModelForm):
     required_css_class = "formrequired"

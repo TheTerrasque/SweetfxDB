@@ -1,0 +1,12 @@
+**/settings_local.py
+*.db
+env/
+**/*.sqlite3
+.git/
+**/__pycache__
+spam_flush.py
+supervisord.log
+supervisord.pid
+todo.txt
+makeandsend.bat
+media/

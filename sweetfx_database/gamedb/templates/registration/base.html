@@ -1,6 +1,5 @@
 {% extends "base/base.html" %}
 
 {% block sidemenu %}
-    <li><a class="rss" href="{% url registration_register %}">New account</a></li>
-    <li><a href="{% url auth_password_reset %}">Reset password</a></li>
+    <li><a class="rss" href="{% url 'django_registration_register' %}">New account</a></li>
 {% endblock %}

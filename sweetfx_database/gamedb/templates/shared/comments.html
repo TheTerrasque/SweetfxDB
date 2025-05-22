@@ -16,7 +16,7 @@
         <div id="commentform">
             {% if user.is_authenticated %}
                 <p>Write a new comment:</p>
-                <form method="post" action="{% url g-save-comment %}">
+                <form method="post" action="{% url 'g-save-comment' %}">
                     <input type="hidden" name="cid" value="{{ object.id }}" />
                     <input type="hidden" name="cname" value="{{ object.comments.content_type }}" />
                     {% csrf_token %}

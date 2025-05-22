@@ -1,6 +1,6 @@
-import models as M
+from . import models as M
 from django.contrib import admin
-import reversion
+from reversion import admin as reversion
 
 class Category(reversion.VersionAdmin):
     list_display = ["name", "sortweight"]

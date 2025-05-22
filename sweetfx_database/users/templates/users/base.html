@@ -3,10 +3,10 @@
 {% block sidemenu %}
     {% if user.is_authenticated %}
     <li>
-        <a href="{% url user-profile %}">Edit Profile</a>
+        <a href="{% url 'user-profile' %}">Edit Profile</a>
     </li>
     <li>
-        <a href="{% url user-favs %}">Preset favorites</a>
+        <a href="{% url 'user-favs' %}">Preset favorites</a>
     </li>
     {% endif %}
 {% endblock %}

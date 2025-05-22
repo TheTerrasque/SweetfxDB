@@ -4,7 +4,7 @@
 {% block main %}
 <div id="breads">
     <ul class="horizmenu">
-        <li><a href="{% url forum-main %}">Forums</a></li>
+        <li><a href="{% url 'forum-main' %}">Forums</a></li>
         <li>{{ forum.render }}</li>
     </ul>
 </div>
@@ -19,7 +19,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for thread in forum.forumthread_set.all %}
+            {% for thread in forum.get_threads %}
             <tr>
                 <td><a href="{{ thread.get_absolute_url }}">{{ thread.title }}</a></td>
                 <td>{% cache 600 userlink thread.creator_id %}{% include "shared/user.html" with user=thread.creator %}{% endcache %}</td>
@@ -31,5 +31,5 @@
         </tbody>
     </table>
     
-<div id="newthreadlink"><a href="{% url forum-new-thread forum.slug %}">New thread</a></div>
+<div id="newthreadlink"><a href="{% url 'forum-new-thread' forum.slug %}">New thread</a></div>
 {% endblock %}

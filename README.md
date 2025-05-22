@@ -4,9 +4,7 @@ Code for sfx.thelazy.net
 
 To set up:
 
-1. First, install python 2.x
-2. (Optional)create virtualenv and 
-3. run "pip install -r reqs.txt" to install required packages
-4. run "python manage.py syncdb --migrate --noinput" -> sets up an sqlite database
-5. run "python manage.py createsuperuser" -> sets up superuser
-6. run "python manage.py runserver" -> starts a test server on localhost:8000
+1. docker-compose up --build
+2. visit http://$dockerhost:8124/
+3. To create admin user: docker-compose exec sweetfx python manage.py createsuperuser
+4. To reset stored data and db: docker-compose down -v

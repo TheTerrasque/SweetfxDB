@@ -5,7 +5,7 @@
 {% block page %}
 <div id="breads">
     <ul class="horizmenu">
-        <li><a href="{% url g-games-list %}">Games list</a></li>
+        <li><a href="{% url 'g-games-list' %}">Games list</a></li>
         <li>{{ object.preset.game.render }}</li>
         <li>{{ object.preset.render }}</li>
         <li><a href="{{ object.get_absolute_url }}">{{ object }}</a></li>

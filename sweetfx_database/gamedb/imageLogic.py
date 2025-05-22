@@ -1,8 +1,12 @@
 from PIL import Image
 from PIL import ImageFile
-import cStringIO
+from io import BytesIO
 from django.core.files.uploadedfile import SimpleUploadedFile
 import os.path
+import subprocess
+
+def optimize_png(filepath):
+    subprocess.run(["optipng", filepath])
 
 class BaseImage(object):
     
@@ -30,7 +34,7 @@ class BaseImage(object):
         return self.save_options
     
     def store_image(self):
-        res = cStringIO.StringIO()
+        res = BytesIO()
         ImageFile.MAXBLOCK = 1024 * 1024
         options = self.get_save_options()
         self.image.save(res, **options)
@@ -54,7 +58,7 @@ class ResizeImage(BaseImage):
         nw, nh = self.new_size
         ratio = min(float(nw)/cur_w, float(nh)/cur_h)
         new_size = (int(cur_w * ratio), int(cur_h * ratio))
-        self.image = self.image.resize(new_size, Image.ANTIALIAS)
+        self.image = self.image.resize(new_size, Image.LANCZOS)
 
 class CompressImage(BaseImage):
     
@@ -76,4 +80,3 @@ def resize_image(path, size=(1024, 1024), quality=65, format="JPEG"):
     handler.save_options["format"] = format
     handler.save_options["quality"] = quality
     return handler.save_image()
-

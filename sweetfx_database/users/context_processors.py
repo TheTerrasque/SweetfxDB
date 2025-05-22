@@ -1,14 +1,15 @@
-from models import Theme
+from .models import Theme
+from django.conf import settings
 
-DEFAULT = "/static/css/style.css"
+DEFAULT = settings.CSSURL or "/static/css/style.css"
 
 def set_style(request):
     r = { "CSSURL" : DEFAULT }
     q = Theme.objects.filter(default=True)
     if q:
         r = { "CSSURL" : q[0].css }
-    if request.user.is_authenticated():
-        profile = request.user.get_profile()
+    if request.user.is_authenticated:
+        profile = request.user.userprofile
         if profile.css.strip():
             r = { "CSSURL" : profile.css.strip()}
         elif profile.theme:

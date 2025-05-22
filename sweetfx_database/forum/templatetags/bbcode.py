@@ -53,15 +53,15 @@ def do_bbcode(text):
         text = rx.sub(bla, text)
     return u"<div class='bbtext'>%s</div>" %text
 
-@register.assignment_tag
+@register.simple_tag
 def get_latest_forumthreads(string=None):
     if not string:
         num = 5
     else:
         num = int(string)
-    return forumdb.ForumThread.objects.select_related("last_post", "forum").order_by("-updated")[:num]
+    return forumdb.ForumThread.objects.latest_threads().select_related("last_post", "forum").order_by("-updated")[:num]
 
-@register.assignment_tag
+@register.simple_tag
 def get_latest_forumposts(string=None):
     if not string:
         num = 5

@@ -41,7 +41,7 @@ padding:0;
 float:left;
 margin-top:-7px;
 margin-left:-10px;
-background-image:url(http://sfx.thelazy.net/static/css/images/fancy.png);
+background-image:url(/static/css/images/fancy.png);
 height:38px;
 background-repeat:no-repeat;
 padding-left:46px;
@@ -62,7 +62,7 @@ padding:0;
 
 body {
 background-color:#FFF;
-background-image: url("pcmr2.gif");
+background-image: url("pcmr.png");
 background-position:75% 50%; 
 background-repeat:no-repeat;
 background-attachment:fixed;
@@ -614,7 +614,7 @@ border-radius: 7px;
 
 input,textarea {
     border-radius: 6px;
-    padding: 5px; !important
+    padding: 5px;
 }
 input:focus,textarea:focus {
     border: 1px solid #FF9191; outline: none !important;

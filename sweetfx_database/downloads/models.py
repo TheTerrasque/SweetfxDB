@@ -7,7 +7,7 @@ class DownloadCategory(models.Model):
     sortweight = models.IntegerField(default=100)
     description = models.TextField(blank=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:
@@ -15,7 +15,7 @@ class DownloadCategory(models.Model):
         
 class DownloadFile(models.Model):
     dlfile = models.FileField(upload_to="downloads")
-    category = models.ForeignKey(DownloadCategory)
+    category = models.ForeignKey(DownloadCategory, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     
     added = models.DateTimeField(auto_now_add=True)
@@ -23,7 +23,7 @@ class DownloadFile(models.Model):
     sortweight = models.IntegerField(default=100)
     description = models.TextField(blank=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:

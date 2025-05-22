@@ -1,29 +1,24 @@
-import models as gamedb
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
+from . import models as gamedb
+from django.contrib.auth.decorators import login_required, permission_required
+
 # Create your views here.
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
-import forms
+from . import forms
+from .mixins import PaginateMixin, GQsMixin, LoginReq
 from datetime import datetime
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.contenttypes.models import ContentType
-from django.utils import simplejson
 
 from django.http import Http404
 
 from django.utils.html import escape
 
-class LoginReq(object):
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(LoginReq, self).dispatch(*args, **kwargs)
 
-class GQsMixin(object):
-    queryset = gamedb.Game.active.all()
-
-class PaginateMixin(object):
-    paginate_by = 25
+class GamePermissionReq(PermissionRequiredMixin):
+    permission_required = "gamedb.post_on_games"
+    permission_denied_message = "Posting is disabled your user. Contact Terrasque on Discord to enable posting for your account."
 
 class GameList(PaginateMixin, GQsMixin, ListView):
     pass
@@ -31,7 +26,7 @@ class GameList(PaginateMixin, GQsMixin, ListView):
 class GameDetails(GQsMixin, DetailView):
     pass
 
-class AddPreset(LoginReq, CreateView):
+class AddPreset(GamePermissionReq, CreateView):
     form_class = forms.PresetForm
     template_name = "gamedb/add_preset.html"
 
@@ -44,17 +39,16 @@ class AddPreset(LoginReq, CreateView):
         return super(AddPreset, self).form_valid(form)
 
 def search(request):
-    query = request.REQUEST.get("query")
-    data = {}
+    query = request.GET.get("query") or request.POST.get("query")
+    r = {}
     if query:
         games = gamedb.Game.active.filter(title__icontains=query)[:5]
-        r = {}
         r["Games"] = [{"title": x.title, "url": x.get_absolute_url()} for x in games]
-        data = simplejson.dumps(r)
-    return HttpResponse(data, mimetype="text/json")
+        #data = json.dumps(r)
+    return JsonResponse(r)
     
 
-class AddGame(LoginReq, CreateView):
+class AddGame(GamePermissionReq, CreateView):
     form_class = forms.GameForm
     template_name = "gamedb/add_game.html"
 
@@ -63,7 +57,7 @@ class AddGame(LoginReq, CreateView):
         self.object.creator = self.request.user
         return super(AddGame, self).form_valid(form)
 
-class AddScreenshot(LoginReq, CreateView):
+class AddScreenshot(GamePermissionReq, CreateView):
     form_class = forms.PresetScreenshotForm
     template_name = "gamedb/add_screenshot.html"
 
@@ -96,7 +90,7 @@ def download_preset(request, pk):
     
     r.downloads +=1
     r.save()
-    response = HttpResponse(mimetype='text/plain')
+    response = HttpResponse(content_type='text/plain')
     response['Content-Disposition'] = 'attachment; filename="SweetFX_Settings_%s_%s.txt"' % (r.game.title.encode("utf8"), r.title.encode("utf8"))
     response.write(r.settings_text)
     return response
@@ -122,7 +116,7 @@ class EditPreset(LoginReq, UpdateView):
     def form_valid(self, form):
         form.instance.updated = datetime.now()
         for fav in form.instance.favorites.all():
-            fav.user.get_profile().add_alert(u"Preset %s was updated" % form.instance.render())
+            fav.user.userprofile.add_alert(u"Preset %s was updated" % form.instance.render())
         return super(EditPreset, self).form_valid(form)
 
     def get_queryset(self):
@@ -142,7 +136,7 @@ class EditGame(LoginReq, UpdateView):
     def get_queryset(self):
         return gamedb.Game.objects.filter(creator=self.request.user)
 
-@login_required
+@permission_required("gamedb.post_on_games", raise_exception=True)
 def save_comment(request):
     data = request.POST
     cname = data.get("cname").replace(" ", "")
@@ -151,14 +145,14 @@ def save_comment(request):
     if comment:
         ctype = ContentType.objects.get(model=cname)
         obj = ctype.get_object_for_this_type(id=cid)
-        objname = escape(unicode(obj))
+        objname = escape(str(obj))
         c = gamedb.UserComment(comment=comment, creator=request.user)
         c.content_object = obj
         c.save()
         
         if request.user != obj.creator:
             msg = "You have a new comment on : <a href='%s'>%s</a>" % (obj.get_absolute_url(), objname)
-            obj.creator.get_profile().add_alert(msg)
+            obj.creator.userprofile.add_alert(msg)
         
         return HttpResponseRedirect(obj.get_absolute_url() + "#comments")
     return HttpResponseRedirect("/")

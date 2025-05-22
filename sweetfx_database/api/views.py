@@ -1,6 +1,6 @@
 from sweetfx_database.api import serializers as S
 from sweetfx_database.gamedb import models as GM
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import filters
 
@@ -46,7 +46,7 @@ class GameViewSet(SeparateViewSet):
         'retrieve': GM.Game.active.all().select_related("preset_set"),
     }
 
-    @list_route()
+    @action(detail=False)
     def newest(self, request):
         recent_presets = self.get_queryset().order_by('-id')
         page = self.paginate_queryset(recent_presets)
@@ -74,7 +74,7 @@ class PresetViewSet(SeparateViewSet):
         'retrieve': GM.Preset.active.all().select_related("game", "presetscreenshot_set"),
     }
 
-    @list_route()
+    @action(detail=False)
     def newest(self, request):
         recent_presets = self.get_queryset().order_by('-id')
         page = self.paginate_queryset(recent_presets)

@@ -3,7 +3,7 @@
 {% block main %}
     <div id="breads">
         <ul class="horizmenu">
-            <li><a href="{% url g-games-list %}">Games list</a></li>
+            <li><a href="{% url 'g-games-list' %}">Games list</a></li>
         </ul>
     </div>
     {% include "shared/ads.html" %}
@@ -29,6 +29,6 @@
     </table>
     {% include "shared/pagination.html" %}
     <div class="buttoner">
-        <a href="{% url g-game-add %}" class="button">Add a game to the list</a>
+        <a href="{% url 'g-game-add' %}" class="button">Add a game to the list</a>
     </div>
 {% endblock %}

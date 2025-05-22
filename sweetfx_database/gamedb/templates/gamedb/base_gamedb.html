@@ -1,13 +1,13 @@
 {% extends "base/base.html" %}
 
 {% block sidemenu %}
-    <li><a href="{% url g-preset-new-list %}">Latest presets</a></li>
-    <li><a href="{% url g-preset-popular-list %}">Popular presets</a></li>
+    <li><a href="{% url 'g-preset-new-list' %}">Latest presets</a></li>
+    <li><a href="{% url 'g-preset-popular-list' %}">Popular presets</a></li>
     <br/>
-    <li><a href="{% url g-show-template "install" %}">Install help</a></li>
-    <li><a href="{% url g-show-template "addgame" %}">How to add a preset</a></li>
+    <li><a href="{% url 'g-show-template' "install" %}">Install help</a></li>
+    <li><a href="{% url 'g-show-template' "addgame" %}">How to add a preset</a></li>
     <br/>
-    <li><a class="rss" href="{% url g-feed-presets %}">RSS Feed</a></li>
+    <li><a class="rss" href="{% url 'g-feed-presets' %}">RSS Feed</a></li>
     <br/>
     <li><input id="isearch" name="search" placeholder="Search"/></li>
     <script>
@@ -30,7 +30,7 @@
             position_under($("#isearch"), sdiv, -5);
             rdiv.append($("<span/>").text("Searching..."));
             
-            $.get("{% url g-game-search %}", {"query": query}, function (data) {
+            $.get("{% url 'g-game-search' %}", {"query": query}, function (data) {
                 rdiv.empty();
                 
                 $.each(data, function (i, val) {
