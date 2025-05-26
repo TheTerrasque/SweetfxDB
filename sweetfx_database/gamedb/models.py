@@ -17,6 +17,34 @@ from django.dispatch import receiver
 from django_registration.signals import user_registered
 # Create your models here.
 
+# Spam states for Games and Presets
+UNCHECKED = 0
+VISIBLE = 1
+SUSPECTED_SPAM = 2
+UNSURE = 3
+ERROR = 4
+VERIFIED_SPAM = 5
+MISTAKEN_FOR_SPAM = 6
+PARENT_GAME_SPAM = 7 # New state for presets whose parent game is spam
+
+GAME_PRESET_STATE_CHOICES = [
+    (UNCHECKED, "Unchecked"),
+    (VISIBLE, "Visible"),
+    (SUSPECTED_SPAM, "Suspected Spam"),
+    (UNSURE, "Unsure"),
+    (ERROR, "Error"),
+    (VERIFIED_SPAM, "Verified spam"),
+    (MISTAKEN_FOR_SPAM, "Mistaken for spam"),
+]
+
+PRESET_STATE_CHOICES = GAME_PRESET_STATE_CHOICES + [
+    (PARENT_GAME_SPAM, "Parent Game Marked Spam"),
+]
+
+# Define groups of states
+GAMES_PRESETS_SPAM_STATES = [SUSPECTED_SPAM, VERIFIED_SPAM]
+GAMES_PRESETS_VISIBLE_STATES = [UNCHECKED, VISIBLE, UNSURE, ERROR, MISTAKEN_FOR_SPAM, PARENT_GAME_SPAM] # PARENT_GAME_SPAM is visible until manually checked
+
 from . import imageLogic
 import os
 
@@ -36,6 +64,10 @@ SWEETFX_VERSION = (
 class ActiveManager(models.Manager):
     def get_queryset(self):
         return super(ActiveManager, self).get_queryset().filter(visible=True)
+
+class StateActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(state__in=GAMES_PRESETS_VISIBLE_STATES)
     
 
 class RenderMixin(object):
@@ -69,24 +101,40 @@ class Game(RenderMixin, models.Model):
     exename = models.CharField(max_length=20, blank = True, help_text= _("Name of the executable for this game"))
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     added = models.DateField(auto_now_add=True)
-    visible = models.BooleanField(default=True, blank=True, db_index=True)
+    # visible = models.BooleanField(default=True, blank=True, db_index=True) # Replaced by state
     sweetfx_notes = models.TextField(blank=True, help_text= _("Any general SweetFX notes about this game"))
+    state = models.IntegerField(choices=GAME_PRESET_STATE_CHOICES, default=UNCHECKED, db_index=True)
+    state_reason = models.TextField(blank=True, default="")
 
     preset_count = models.IntegerField(default=0)
 
     comments = GenericRelation(UserComment)
 
-    active = ActiveManager()
+    active = StateActiveManager() # Changed from ActiveManager
     objects = models.Manager()
 
     def update_preset_count(self):
         self.preset_count = self.get_presets().count()
+    
+    def update_state(self, new_state, reason=""): # Renamed from set_state
+        self.state = new_state
+        self.state_reason = reason
+        self.save()
+        # If game is marked as spam, update its presets
+        if new_state in GAMES_PRESETS_SPAM_STATES:
+            for preset in self.preset_set.all():
+                preset.update_state(PARENT_GAME_SPAM, reason="Parent game marked as spam.") # Renamed from set_state
+        # If game is un-spammed, mark child presets as VISIBLE (or UNCHECKED if you prefer a manual review)
+        elif self.state in GAMES_PRESETS_SPAM_STATES and new_state not in GAMES_PRESETS_SPAM_STATES:
+             for preset in self.preset_set.filter(state=PARENT_GAME_SPAM):
+                preset.update_state(UNCHECKED, reason="Parent game un-spammed.") # Renamed from set_state
+
 
     def get_comments(self):
         return self.comments.filter(visible=True)
 
     def get_presets(self):
-        return self.preset_set.filter(visible=True)
+        return self.preset_set.filter(state__in=GAMES_PRESETS_VISIBLE_STATES) # Use state for filtering
 
     def __str__(self):
         return self.title
@@ -125,8 +173,10 @@ class Preset(RenderMixin, models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
-    visible = models.BooleanField(db_index=True, default=True, blank=True, help_text="Display the preset on the game page")
-    active = ActiveManager()
+    # visible = models.BooleanField(db_index=True, default=True, blank=True, help_text="Display the preset on the game page") # Replaced by state
+    state = models.IntegerField(choices=PRESET_STATE_CHOICES, default=UNCHECKED, db_index=True)
+    state_reason = models.TextField(blank=True, default="")
+    active = StateActiveManager() # Changed from ActiveManager
     objects = models.Manager()
 
     #sweetfx_version = models.IntegerField(choices=SWEETFX_VERSION, help_text= _("The SweetFX version the config is for"))
@@ -146,7 +196,19 @@ class Preset(RenderMixin, models.Model):
         return self.presetscreenshot_set.filter(visible=True)
 
     def is_active(self, user=None):
-        return self.visible
+        return self.state in GAMES_PRESETS_VISIBLE_STATES # Use state for checking if active
+
+    def update_state(self, new_state, reason=""): # Renamed from set_state
+        # Prevent changing state if parent game is spam and new state is not PARENT_GAME_SPAM
+        # unless the game itself is being un-spammed.
+        if self.game.state in GAMES_PRESETS_SPAM_STATES and \
+           new_state != PARENT_GAME_SPAM and \
+           not (self.game.state in GAMES_PRESETS_SPAM_STATES and new_state == UNCHECKED and reason == "Parent game un-spammed."):
+            # Optionally, log this attempt or handle as an error
+            return
+        self.state = new_state
+        self.state_reason = reason
+        self.save()
 
     def __str__(self):
         return self.title

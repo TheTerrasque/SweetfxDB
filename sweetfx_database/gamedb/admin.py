@@ -3,8 +3,8 @@ from django.contrib import admin
 from reversion import admin as reversion
 
 class Preset(reversion.VersionAdmin):
-    list_display = ["title", "creator", "game"]
-    list_filter = ["visible"]
+    list_display = ["title", "creator", "game", "state"] # Added state
+    list_filter = ["state"] # Changed from visible
     date_hierarchy = "added"
     search_fields = ["title", "creator__username", "game__title"]
     raw_id_fields = ["creator", "game"]
@@ -22,8 +22,8 @@ class Screenshot(reversion.VersionAdmin):
     raw_id_fields = ["preset", "creator"]
 
 class Game(reversion.VersionAdmin):
-    list_display = ["title", "creator"]
-    list_filter = ["visible"]
+    list_display = ["title", "creator", "state"] # Added state
+    list_filter = ["state"] # Changed from visible
     date_hierarchy = "added"
     search_fields = ["title", "creator__username"]
     raw_id_fields = ["creator"]

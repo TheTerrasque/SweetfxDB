@@ -103,7 +103,7 @@ class ForumPost(models.Model):
     state = models.IntegerField(choices=[
         (0, "Unchecked"),
         (1, "Visible"),
-        (2, "Spam"),
+        (2, "Suspected Spam"), # Changed from "Spam"
         (3, "Unsure"),
         (4, "Error"),
         (5, "Verified spam"),

@@ -7,7 +7,7 @@ class RequiredForm(ModelForm):
 class PresetForm(RequiredForm):
     class Meta:
         model = M.Preset
-        fields = ("title", "shader", "description", "settings_text", "visible")
+        fields = ("title", "shader", "description", "settings_text") # Removed "visible"
 
 class GameForm(RequiredForm):
     class Meta:
@@ -17,4 +17,4 @@ class GameForm(RequiredForm):
 class PresetScreenshotForm(RequiredForm):
     class Meta:
         model = M.PresetScreenshot
-        fields = ("image", "sweetfx_state", "description", "comparison_image", "visible")
+        fields = ("image", "sweetfx_state", "description", "comparison_image") # Removed "visible"
