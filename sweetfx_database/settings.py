@@ -333,6 +333,17 @@ Text: {{post.text}}
 Is this post wanted on the forum?
 """
 
+DEFAULT_COMMENT_PROMPT = """{{RULES}}
+
+Comment:
+-------------------
+Content Type: {{comment.content_type}}
+User: {{comment.creator}}
+Text: {{comment.comment}}
+-------------------
+Is this comment wanted on the site?
+"""
+
 try:
     from .settings_local import *
 except ImportError:

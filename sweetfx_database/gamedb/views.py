@@ -146,14 +146,14 @@ def save_comment(request):
         ctype = ContentType.objects.get(model=cname)
         obj = ctype.get_object_for_this_type(id=cid)
         objname = escape(str(obj))
-        c = gamedb.UserComment(comment=comment, creator=request.user)
+        c = gamedb.UserComment(comment=comment, creator=request.user, ip=request.META.get('REMOTE_ADDR', ''))
         c.content_object = obj
         c.save()
-        
+
         if request.user != obj.creator:
             msg = "You have a new comment on : <a href='%s'>%s</a>" % (obj.get_absolute_url(), objname)
             obj.creator.userprofile.add_alert(msg)
-        
+
         return HttpResponseRedirect(obj.get_absolute_url() + "#comments")
     return HttpResponseRedirect("/")
 

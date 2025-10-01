@@ -9,12 +9,22 @@ class Preset(reversion.VersionAdmin):
     search_fields = ["title", "creator__username", "game__title"]
     raw_id_fields = ["creator", "game"]
 
+def mark_comment_as_verified_spam(modeladmin, request, queryset):
+    for comment in queryset:
+        comment.update_state(5)
+
+def mark_comment_as_mistaken_spam(modeladmin, request, queryset):
+    for comment in queryset:
+        comment.update_state(6)
+
 class Comment(reversion.VersionAdmin):
-    list_filter = ["visible", "content_type"]
-    list_display = ["creator", "content_type", "visible", "added", "get_text_start"]
+    list_filter = ["visible", "content_type", "state"]
+    list_display = ["creator", "content_type", "comment_short", "added", "state"]
+    list_editable = ["state"]
     search_fields = ["creator__username", "comment"]
     date_hierarchy = "added"
     raw_id_fields = ["creator"]
+    actions = [mark_comment_as_verified_spam, mark_comment_as_mistaken_spam]
 
 class Screenshot(reversion.VersionAdmin):
     list_filter = ["visible"]

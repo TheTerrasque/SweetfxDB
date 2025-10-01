@@ -48,17 +48,43 @@ class UserComment(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.TextField()
     added = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(blank=True, null=True)
     visible = models.BooleanField(default=True, blank=True)
+    ip = models.CharField(max_length=200, blank=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField(db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
+
+    state_reason = models.TextField(blank=True, default="")
+    state = models.IntegerField(choices=[
+        (0, "Unchecked"),
+        (1, "Visible"),
+        (2, "Spam"),
+        (3, "Unsure"),
+        (4, "Error"),
+        (5, "Verified spam"),
+        (6, "Mistaken for spam")
+    ], default=0, db_index=True)
 
     def __str__(self):
         return u"%s comment by %s" % (self.content_type, self.creator)
 
     def get_text_start(self):
         return self.comment[:50]
+
+    def comment_short(self):
+        return self.comment[:200]
+
+    def update_state(self, newstate=None, reason=None):
+        if newstate != None:
+            self.state = newstate
+            if reason:
+                self.state_reason = reason
+            self.save()
+
+    def is_edited(self):
+        return self.updated and self.added.toordinal() != self.updated.toordinal()
 
     class Meta:
         ordering = ["-id"]
@@ -267,7 +293,7 @@ def update_game_preset_number(sender, **kwargs):
 
 @receiver(post_save, sender=PresetScreenshot)
 def my_handler(sender, **kwargs):
-    instance = kwargs["instance"]
+    instance: PresetScreenshot = kwargs["instance"]
     key = "psc%s" % instance.id
     mkey = "prc%s" % instance.id
     
