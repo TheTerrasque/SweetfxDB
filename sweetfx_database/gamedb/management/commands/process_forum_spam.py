@@ -73,8 +73,8 @@ class Command(BaseCommand):
         )
 
         laya = from_settings(settings)
-        if options.get("laya-url") is not None:
-            laya.base_url = options["laya-url"].rstrip("/")
+        if options.get("laya_url") is not None:
+            laya.base_url = options["laya_url"].rstrip("/")
 
         progress = options.get('progress')
         print_info = not options.get('quiet')
