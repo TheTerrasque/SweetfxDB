@@ -14,6 +14,5 @@ class Migration(migrations.Migration):
             model_name='forumpost',
             name='error_count',
             field=models.PositiveSmallIntegerField(default=0),
-            preserve_default=False,
         ),
     ]

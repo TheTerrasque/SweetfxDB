@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from sweetfx_database.forum.laya_prefilter import (
-    LayaPrefilter, domain_of, in_allowlist, preprocess,
+    LayaPrefilter, LayaVerdict, domain_of, in_allowlist, preprocess,
     DEFAULT_ALLOWED_DOMAINS,
 )
 
@@ -78,65 +78,77 @@ class DecideTest(TestCase):
     def test_disabled(self):
         laya = LayaPrefilter(base_url="")
         self.assertFalse(laya.enabled)
-        self.assertEqual(laya.decide("whatever"), (None, "laya disabled"))
+        self.assertEqual(laya.decide("whatever"),
+                         LayaVerdict(None, "laya disabled", None))
 
     def test_unavailable_falls_through(self):
         laya = LayaPrefilter(base_url="http://laya")
         laya._predict = lambda state, question: None
-        self.assertEqual(laya.decide("whatever"), (None, "laya unavailable"))
+        self.assertEqual(laya.decide("whatever"),
+                         LayaVerdict(None, "laya unavailable", None))
 
     def test_spam_verdict(self):
         self.score = 0.999
-        action, _ = self.make().decide("buy cheap xanax now")
-        self.assertEqual(action, "spam")
+        v = self.make().decide("buy cheap xanax now")
+        self.assertEqual(v.action, "spam")
+        self.assertAlmostEqual(v.score, 0.999)
 
     def test_threshold_boundary(self):
         self.score = 0.99
-        action, _ = self.make(spam_threshold=0.99).decide("spammy text")
-        self.assertEqual(action, "spam")
+        v = self.make(spam_threshold=0.99).decide("spammy text")
+        self.assertEqual(v.action, "spam")
+        self.assertAlmostEqual(v.score, 0.99)
 
         self.score = 0.989
-        action, _ = self.make(spam_threshold=0.99).decide("spammy text")
-        self.assertIsNone(action)
+        v = self.make(spam_threshold=0.99).decide("spammy text")
+        self.assertIsNone(v.action)
+        self.assertAlmostEqual(v.score, 0.989)
 
     def test_allowlist_veto(self):
         # High spam score, but the only link is to a known-good domain.
         self.score = 0.999
-        action, reason = self.make().decide("Injector: https://yadi.sk/i/abcdef")
-        self.assertIsNone(action)
-        self.assertIn("all links allowed", reason)
+        v = self.make().decide("Injector: https://yadi.sk/i/abcdef")
+        self.assertIsNone(v.action)
+        self.assertIn("all links allowed", v.reason)
+        self.assertAlmostEqual(v.score, 0.999)
 
     def test_mixed_links_no_veto(self):
         self.score = 0.999
-        action, _ = self.make().decide(
+        v = self.make().decide(
             "See https://reshade.me and http://t.me/spamshop")
-        self.assertEqual(action, "spam")
+        self.assertEqual(v.action, "spam")
+        self.assertAlmostEqual(v.score, 0.999)
 
     def test_pass_threshold(self):
         self.score = 0.02
-        action, _ = self.make(pass_threshold=0.1).decide("Thanks for the preset!")
-        self.assertEqual(action, "visible")
+        v = self.make(pass_threshold=0.1).decide("Thanks for the preset!")
+        self.assertEqual(v.action, "visible")
+        self.assertAlmostEqual(v.score, 0.02)
 
     def test_mid_score_falls_through(self):
         self.score = 0.5
-        action, _ = self.make(pass_threshold=0.1).decide("something in between")
-        self.assertIsNone(action)
+        v = self.make(pass_threshold=0.1).decide("something in between")
+        self.assertIsNone(v.action)
+        self.assertAlmostEqual(v.score, 0.5)
 
     def test_marker_confirm_veto(self):
         laya = LayaPrefilter(base_url="http://laya", spam_threshold=0.99,
                              require_marker_confirm=True)
         scores = iter([0.999, 0.1])
         laya._predict = lambda state, question: next(scores)
-        action, _ = laya.decide("buy xanax http://t.me/shop")
-        self.assertIsNone(action)
+        v = laya.decide("buy xanax http://t.me/shop")
+        self.assertIsNone(v.action)
+        # The verdict carries the baseline score, not the marker score.
+        self.assertAlmostEqual(v.score, 0.999)
 
     def test_marker_confirm_agrees(self):
         laya = LayaPrefilter(base_url="http://laya", spam_threshold=0.99,
                              require_marker_confirm=True)
         scores = iter([0.999, 0.999])
         laya._predict = lambda state, question: next(scores)
-        action, _ = laya.decide("buy xanax http://t.me/shop")
-        self.assertEqual(action, "spam")
+        v = laya.decide("buy xanax http://t.me/shop")
+        self.assertEqual(v.action, "spam")
+        self.assertAlmostEqual(v.score, 0.999)
 
 
 class FromSettingsTest(TestCase):

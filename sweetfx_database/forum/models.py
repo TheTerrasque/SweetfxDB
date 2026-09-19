@@ -113,6 +113,7 @@ class ForumPost(models.Model):
     # Incremented on each failed judgment, reset on a successful one.
     # process_forum_spam stops retrying posts that reach the error cap.
     error_count = models.PositiveSmallIntegerField(default=0)
+    laya_score = models.FloatField(null=True)
 
     def text_short(self):
         return self.text[:200]

@@ -31,8 +31,9 @@ def reset_error_count(modeladmin, request, queryset):
         post.save()
 
 class ForumPost(reversion.VersionAdmin):
-    list_display = ["creator", "thread","text_short", "created", "state", "error_count"]
+    list_display = ["creator", "thread","text_short", "created", "state", "error_count", "laya_score"]
     list_editable = ["state"]
+    readonly_fields = ["laya_score"]
     search_fields = ["text", "creator__username"]
     raw_id_fields = ["creator", "thread"]
     date_hierarchy = "created"

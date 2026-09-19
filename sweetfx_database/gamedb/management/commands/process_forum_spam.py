@@ -123,14 +123,17 @@ class Command(BaseCommand):
                 # First tier: fast laya prefilter. Obvious spam is hidden
                 # without an LLM call; clear non-spam can skip the LLM
                 # entirely; everything else falls through to the LLM.
-                action, reason = laya.decide(post.text)
-                if action == "spam":
+                verdict = laya.decide(post.text)
+                if verdict.score is not None:
+                    post.laya_score = verdict.score
+                    post.save()
+                if verdict.action == "spam":
                     post.error_count = 0
-                    post.update_state(2, reason)
+                    post.update_state(2, verdict.reason)
                     r = oai.check_spam_permissions(post)
-                elif action == "visible":
+                elif verdict.action == "visible":
                     post.error_count = 0
-                    post.update_state(1, reason)
+                    post.update_state(1, verdict.reason)
                 else:
                     r = oai.judge_post(post)
             else:

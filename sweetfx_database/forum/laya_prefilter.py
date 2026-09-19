@@ -26,6 +26,8 @@ so the prefilter can never break the spam pipeline.
 import json
 import re
 import urllib.request
+from dataclasses import dataclass
+from typing import Optional
 
 # Domains that legit users actually share (data-driven: used by good
 # posts, rarely by verified spam). Spammers use telegram, t.me, seo
@@ -144,35 +146,39 @@ class LayaPrefilter:
     def decide(self, text):
         """Decide what to do with a post.
 
-        Returns (action, reason) where action is:
+        Returns a LayaVerdict where action is:
           "spam"    - auto-hide the post
           "visible" - mark visible without asking the LLM
                       (only when pass_threshold is set and score is below it)
           None      - no decision, pass on to the next tier (LLM)
+        and score is the baseline laya spam score (None if unavailable).
         """
         if not self.enabled:
-            return None, "laya disabled"
+            return LayaVerdict(None, "laya disabled", None)
 
         s = self.score(text)
         if s is None:
-            return None, "laya unavailable"
+            return LayaVerdict(None, "laya unavailable", None)
 
         if s >= self.spam_threshold:
             # Allowlist veto: a post whose links are all to known-good
             # domains is not auto-hidden (protects legit link sharing).
             if self._all_links_allowed(text):
-                return None, "laya %.3f but all links allowed" % s
+                return LayaVerdict(None, "laya %.3f but all links allowed" % s,
+                                   s)
             if self.require_marker_confirm:
                 s2 = self.score_markers(text)
                 if s2 is not None and s2 < self.spam_threshold:
-                    return None, "laya %.3f but marker-confirm %.3f" % (s, s2)
-            return "spam", "laya prefilter score %.3f" % s
+                    return LayaVerdict(
+                        None, "laya %.3f but marker-confirm %.3f" % (s, s2), s)
+            return LayaVerdict("spam", "laya prefilter score %.3f" % s, s)
 
         if self.pass_threshold is not None and s < self.pass_threshold:
-            return "visible", "laya prefilter score %.3f below %.2f" % (
-                s, self.pass_threshold)
+            return LayaVerdict(
+                "visible", "laya prefilter score %.3f below %.2f" % (
+                    s, self.pass_threshold), s)
 
-        return None, "laya %.3f, to LLM" % s
+        return LayaVerdict(None, "laya %.3f, to LLM" % s, s)
 
     def _all_links_allowed(self, text):
         """True if the post has at least one URL and every domain is allowed."""
@@ -181,6 +187,19 @@ class LayaPrefilter:
         domains = [d for d in domains if d]
         return bool(domains) and all(in_allowlist(d, self.allowed_domains)
                                      for d in domains)
+
+
+@dataclass
+class LayaVerdict:
+    """Outcome of LayaPrefilter.decide().
+
+    action: "spam", "visible", or None (fall through to the next tier)
+    reason: human-readable explanation (stored as state_reason)
+    score:  baseline laya spam score in [0,1], None if unavailable
+    """
+    action: object
+    reason: str
+    score: Optional[float]
 
 
 def from_settings(settings):
