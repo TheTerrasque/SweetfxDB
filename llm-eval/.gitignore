@@ -1,0 +1,11 @@
+# API key (never commit)
+.key
+
+# Data exports and per-post result dumps (regenerable, too big for git)
+*.json
+*.jsonl
+*.csv
+*.log
+*.sql
+_psql_err.txt
+__pycache__/
