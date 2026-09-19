@@ -7,6 +7,7 @@ Replace this with more appropriate tests for your application.
 
 from types import SimpleNamespace
 
+from django.contrib.auth.models import User
 from django.test import TestCase
 
 from sweetfx_database.forum.laya_prefilter import (
@@ -169,3 +170,39 @@ class FromSettingsTest(TestCase):
         laya = from_settings(SimpleNamespace(LAYA_BASE_URL="http://x",
                                              LAYA_ALLOWED_DOMAINS=[]))
         self.assertEqual(laya.allowed_domains, DEFAULT_ALLOWED_DOMAINS)
+
+
+class AdminActionTest(TestCase):
+    def setUp(self):
+        from sweetfx_database.forum.models import Forum, ForumPost, ForumThread
+        self.Forum, self.ForumPost, self.ForumThread = Forum, ForumPost, ForumThread
+        self.user = User.objects.create_user(username="tester", password="x")
+        self.forum = Forum.objects.create(title="Test", description="d", slug="test")
+        self.thread = ForumThread.objects.create(
+            forum=self.forum, creator=self.user, title="t"
+        )
+
+    def make_post(self, state=4, error_count=0):
+        return self.ForumPost.objects.create(
+            thread=self.thread, creator=self.user, text="hello",
+            state=state, error_count=error_count,
+        )
+
+    def test_reset_error_count_action(self):
+        from sweetfx_database.forum.admin import reset_error_count
+        capped = self.make_post(state=4, error_count=5)
+        fresh = self.make_post(state=0)
+        reset_error_count(None, None, self.ForumPost.objects.filter(
+            id__in=[capped.id, fresh.id]))
+        capped.refresh_from_db()
+        fresh.refresh_from_db()
+        self.assertEqual(capped.error_count, 0)
+        self.assertEqual(fresh.error_count, 0)
+        # The post's state is untouched, only the counter is reset.
+        self.assertEqual(capped.state, 4)
+
+    def test_error_count_in_list_display(self):
+        from sweetfx_database.forum.admin import ForumPost as ForumPostAdmin
+        self.assertIn("error_count", ForumPostAdmin.list_display)
+        action_names = [a.__name__ for a in ForumPostAdmin.actions]
+        self.assertIn("reset_error_count", action_names)
