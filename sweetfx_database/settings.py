@@ -265,6 +265,16 @@ CLOUDFLARE_TURNSTILE_SITEKEY = os.getenv("CLOUDFLARE_TURNSTILE_SITEKEY")
 OPENAI_BASE_URL = os.getenv("SFX_OPENAI_BASE_URL", "")
 OPENAI_KEY = os.getenv("SFX_OPENAI_KEY", "")
 OPENAI_MODEL = os.getenv("SFX_OPENAI_MODEL", "")
+
+# Laya moderation model - first-tier forum spam prefilter
+# (see forum/laya_prefilter.py). Empty base URL = disabled; an
+# unreachable server makes every post fall through to the LLM.
+LAYA_BASE_URL = os.getenv("SFX_LAYA_BASE_URL", "")
+LAYA_SPAM_THRESHOLD = float(os.getenv("SFX_LAYA_SPAM_THRESHOLD", "0.99"))
+LAYA_PASS_THRESHOLD = os.getenv("SFX_LAYA_PASS_THRESHOLD", "")
+LAYA_REQUIRE_MARKER_CONFIRM = os.getenv("SFX_LAYA_REQUIRE_MARKER_CONFIRM", "") in ("1", "true", "yes")
+LAYA_ALLOWED_DOMAINS = [d.strip() for d in os.getenv("SFX_LAYA_ALLOWED_DOMAINS", "").split(",") if d.strip()]
+
 FORUM_RULES = """
 Classify the following content as wanted or not wanted on the forum. Give a reason for your answer.
 

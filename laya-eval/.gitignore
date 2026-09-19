@@ -1,0 +1,5 @@
+# Data exports and per-post score dumps (regenerable, too big for git)
+posts.csv
+scores.csv
+results*.json
+__pycache__/

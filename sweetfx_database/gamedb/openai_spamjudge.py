@@ -44,6 +44,20 @@ class OpenAISpamJudge:
         j["rating"] = {"yes": 1, "no": 2, "maybe": 3}[j["wanted"]]
         return j
 
+    def check_spam_permissions(self, post: fm.ForumPost):
+        """Strip posting permissions if the user's spam posts outnumber
+        their visible ones. Returns 2 if permissions were removed, 1 if
+        the post is spam but permissions were kept, 0 otherwise.
+        Works for spam verdicts from any tier (LLM or laya prefilter)."""
+        if post.state not in fm.POST_SPAM_STATES:
+            return 0
+        num_spams = fm.ForumPost.objects.filter(state__in=fm.POST_SPAM_STATES, creator=post.creator).count()
+        num_nonspams = fm.ForumPost.objects.filter(state__in=fm.POSTS_VISIBLE_STATES, creator=post.creator).count()
+        if num_spams > num_nonspams:
+            self.remove_user_posting_permissions(post.creator)
+            return 2
+        return 1
+
     def judge_post(self, post: fm.ForumPost):
         if not self.active: return -1
 
@@ -53,12 +67,4 @@ class OpenAISpamJudge:
             post.update_state(response["rating"], response["reason"])
         except Exception as e:
             post.update_state(4, str(e))
-
-        if post.state in fm.POST_SPAM_STATES:
-            num_spams = fm.ForumPost.objects.filter(state__in=fm.POST_SPAM_STATES, creator=post.creator).count()
-            num_nonspams = fm.ForumPost.objects.filter(state__in=fm.POSTS_VISIBLE_STATES, creator=post.creator).count()
-            if num_spams > num_nonspams:
-                self.remove_user_posting_permissions(post.creator)
-                return 2
-            return 1
-        return 0
+        return self.check_spam_permissions(post)

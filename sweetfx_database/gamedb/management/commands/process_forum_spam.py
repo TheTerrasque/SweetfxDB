@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from sweetfx_database.forum.models import ForumPost
+from sweetfx_database.forum.laya_prefilter import from_settings
 from sweetfx_database.gamedb.openai_spamjudge import OpenAISpamJudge, BASE_URL, MODEL, KEY
 from tqdm import tqdm
 
@@ -42,6 +44,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            '--laya-url',
+            default=None,
+            help="Laya prefilter base URL (default: SFX_LAYA_BASE_URL; empty = disabled)"
+        )
+
+        parser.add_argument(
             '--quiet',
             action='store_true',
             default=False,
@@ -64,15 +72,31 @@ class Command(BaseCommand):
             options.get("model")
         )
 
+        laya = from_settings(settings)
+        if options.get("laya-url") is not None:
+            laya.base_url = options["laya-url"].rstrip("/")
+
         progress = options.get('progress')
         print_info = not options.get('quiet')
         query = ForumPost.objects.filter(state = 0)[:options.get('num_posts')]
         if progress:
             query = tqdm(query)
         for post in query:
-
-            
-            r = oai.judge_post(post) 
+            r = 0
+            if laya.enabled:
+                # First tier: fast laya prefilter. Obvious spam is hidden
+                # without an LLM call; clear non-spam can skip the LLM
+                # entirely; everything else falls through to the LLM.
+                action, reason = laya.decide(post.text)
+                if action == "spam":
+                    post.update_state(2, reason)
+                    r = oai.check_spam_permissions(post)
+                elif action == "visible":
+                    post.update_state(1, reason)
+                else:
+                    r = oai.judge_post(post)
+            else:
+                r = oai.judge_post(post)
 
             url = colored("https://sfx.thelazy.net" + post.thread.get_absolute_url(), "dark_grey")
             text = f"[{ post.id }] by { post.creator }\t{TYPES[post.state]}\t{ url }"
