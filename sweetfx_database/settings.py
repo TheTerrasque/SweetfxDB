@@ -265,6 +265,10 @@ CLOUDFLARE_TURNSTILE_SITEKEY = os.getenv("CLOUDFLARE_TURNSTILE_SITEKEY")
 OPENAI_BASE_URL = os.getenv("SFX_OPENAI_BASE_URL", "")
 OPENAI_KEY = os.getenv("SFX_OPENAI_KEY", "")
 OPENAI_MODEL = os.getenv("SFX_OPENAI_MODEL", "")
+# Request timeout in seconds for the spam-judge LLM. Thinking models
+# (e.g. Qwen-Latest) can take well over a minute, so raise this when
+# using one (e.g. SFX_OPENAI_TIMEOUT=300).
+OPENAI_TIMEOUT = int(os.getenv("SFX_OPENAI_TIMEOUT", "60"))
 
 # Laya moderation model - first-tier forum spam prefilter
 # (see forum/laya_prefilter.py). Empty base URL = disabled; an

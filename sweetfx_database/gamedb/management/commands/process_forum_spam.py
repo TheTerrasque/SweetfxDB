@@ -14,6 +14,14 @@ TYPES = {
     4: colored("ERROR", "light_red", "on_yellow", attrs=["bold"]),
 }
 
+def pending_posts():
+    """Posts awaiting a spam verdict: unchecked posts (state 0) plus
+    posts whose previous judgment failed (state 4). New posts are
+    ordered first. Posts that error again simply stay in state 4 and
+    are picked up again on the next cron run, so transient problems
+    (rate limits, timeouts, bad JSON) get a fresh chance every cycle."""
+    return ForumPost.objects.filter(state__in=[0, 4]).order_by("state", "id")
+
 class Command(BaseCommand):
     help = 'Filter forum spam entries'
 
@@ -50,6 +58,13 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            '--timeout',
+            type=int,
+            default=None,
+            help="OpenAI request timeout in seconds (default: OPENAI_TIMEOUT or 60)"
+        )
+
+        parser.add_argument(
             '--quiet',
             action='store_true',
             default=False,
@@ -66,10 +81,14 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        oai_args = None
+        if options.get("timeout") is not None:
+            oai_args = {"temperature": 0.1, "timeout": options.get("timeout")}
         oai = OpenAISpamJudge(
             options.get("baseurl"),
             options.get("key"),
-            options.get("model")
+            options.get("model"),
+            oai_args
         )
 
         laya = from_settings(settings)
@@ -78,7 +97,7 @@ class Command(BaseCommand):
 
         progress = options.get('progress')
         print_info = not options.get('quiet')
-        query = ForumPost.objects.filter(state = 0)[:options.get('num_posts')]
+        query = pending_posts()[:options.get('num_posts')]
         if progress:
             query = tqdm(query)
         for post in query:
@@ -101,6 +120,6 @@ class Command(BaseCommand):
             url = colored("https://sfx.thelazy.net" + post.thread.get_absolute_url(), "dark_grey")
             text = f"[{ post.id }] by { post.creator }\t{TYPES[post.state]}\t{ url }"
 
-            if r >=2:
+            if r is not None and r >= 2:
                 text += "\tUser lost posting rights"
             print_info and tqdm.write(text)

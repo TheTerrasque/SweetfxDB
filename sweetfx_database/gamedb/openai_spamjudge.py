@@ -9,7 +9,7 @@ import re
 BASE_URL = getattr(settings, "OPENAI_BASE_URL", None)
 KEY = getattr(settings, "OPENAI_KEY", None)
 MODEL = getattr(settings, "OPENAI_MODEL", None)
-ARGS = getattr(settings, "OPENAI_ARGS", {"temperature":0.1, "timeout": 60})
+ARGS = getattr(settings, "OPENAI_ARGS", {"temperature":0.1, "timeout": getattr(settings, "OPENAI_TIMEOUT", 60)})
 
 RULES = getattr(settings, "FORUM_RULES", None)
 POST_PROMPT = getattr(settings, "DEFAULT_POST_PROMPT", None)
@@ -27,7 +27,7 @@ class OpenAISpamJudge:
             self.thread_template = jinja2.Template(thread_prompt + RESPONSE_FORMAT)
             self.rules = rules
             self.model = model
-            self.args = args
+            self.args = args if args is not None else ARGS
             self.active = True
 
     def remove_user_posting_permissions(self, user: fm.userdb.User):
@@ -58,13 +58,21 @@ class OpenAISpamJudge:
             return 2
         return 1
 
+    def record_error(self, post: fm.ForumPost, error: Exception):
+        """Store the error on the post (state 4). The post stays in
+        state 4 and is picked up again by the next process_forum_spam
+        run (every 9 minutes), so transient failures (rate limits,
+        timeouts, malformed JSON) are retried every round until the
+        LLM succeeds."""
+        post.update_state(4, f"LLM judgment error: {error}")
+
     def judge_post(self, post: fm.ForumPost):
-        if not self.active: return -1
+        if not self.active: return None
 
         prompt = self.post_template.render(RULES=self.rules, post=post)
         try:
             response = self.call_llm_and_get_response(prompt)
             post.update_state(response["rating"], response["reason"])
         except Exception as e:
-            post.update_state(4, str(e))
+            self.record_error(post, e)
         return self.check_spam_permissions(post)
