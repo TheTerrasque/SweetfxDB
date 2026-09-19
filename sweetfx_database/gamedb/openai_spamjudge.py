@@ -59,11 +59,13 @@ class OpenAISpamJudge:
         return 1
 
     def record_error(self, post: fm.ForumPost, error: Exception):
-        """Store the error on the post (state 4). The post stays in
-        state 4 and is picked up again by the next process_forum_spam
-        run (every 9 minutes), so transient failures (rate limits,
-        timeouts, malformed JSON) are retried every round until the
-        LLM succeeds."""
+        """Store the error on the post (state 4) and count it. The post
+        stays in state 4 and is picked up again by the next
+        process_forum_spam run (every 9 minutes) until it accumulates
+        MAX_ERROR_COUNT errors, so transient failures (rate limits,
+        timeouts, malformed JSON) are retried every round while posts
+        that keep failing are eventually left for a human."""
+        post.error_count = (post.error_count or 0) + 1
         post.update_state(4, f"LLM judgment error: {error}")
 
     def judge_post(self, post: fm.ForumPost):
@@ -72,7 +74,10 @@ class OpenAISpamJudge:
         prompt = self.post_template.render(RULES=self.rules, post=post)
         try:
             response = self.call_llm_and_get_response(prompt)
-            post.update_state(response["rating"], response["reason"])
+            newstate = response["rating"]
+            reason = response["reason"]
+            post.error_count = 0
+            post.update_state(newstate, reason)
         except Exception as e:
             self.record_error(post, e)
         return self.check_spam_permissions(post)

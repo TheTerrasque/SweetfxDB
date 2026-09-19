@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 from sweetfx_database.forum.models import ForumPost
 from sweetfx_database.forum.laya_prefilter import from_settings
 from sweetfx_database.gamedb.openai_spamjudge import OpenAISpamJudge, BASE_URL, MODEL, KEY
@@ -14,13 +15,21 @@ TYPES = {
     4: colored("ERROR", "light_red", "on_yellow", attrs=["bold"]),
 }
 
-def pending_posts():
+# A state-4 post is retried on every cron run until it has accumulated
+# this many judgment errors, after which it is left in state 4 (visible)
+# for a human to deal with. Successful judgments reset the counter.
+MAX_ERROR_COUNT = 5
+
+def pending_posts(options):
     """Posts awaiting a spam verdict: unchecked posts (state 0) plus
-    posts whose previous judgment failed (state 4). New posts are
-    ordered first. Posts that error again simply stay in state 4 and
-    are picked up again on the next cron run, so transient problems
-    (rate limits, timeouts, bad JSON) get a fresh chance every cycle."""
-    return ForumPost.objects.filter(state__in=[0, 4]).order_by("state", "id")
+    error posts (state 4) that have not yet exhausted their retry
+    budget. New posts are ordered first. Transient problems (rate
+    limits, timeouts, bad JSON) get a fresh chance every cycle, but a
+    post that keeps failing is eventually left alone."""
+    max_errors = options.get("max_errors") or MAX_ERROR_COUNT
+    return ForumPost.objects.filter(
+        Q(state=0) | Q(state=4, error_count__lt=max_errors)
+    ).order_by("state", "id")
 
 class Command(BaseCommand):
     help = 'Filter forum spam entries'
@@ -65,6 +74,14 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            '--max-errors',
+            type=int,
+            default=MAX_ERROR_COUNT,
+            help="State-4 posts are retried until they have accumulated this "
+                 "many judgment errors (default %d)" % MAX_ERROR_COUNT
+        )
+
+        parser.add_argument(
             '--quiet',
             action='store_true',
             default=False,
@@ -97,7 +114,7 @@ class Command(BaseCommand):
 
         progress = options.get('progress')
         print_info = not options.get('quiet')
-        query = pending_posts()[:options.get('num_posts')]
+        query = pending_posts(options)[:options.get('num_posts')]
         if progress:
             query = tqdm(query)
         for post in query:
@@ -108,9 +125,11 @@ class Command(BaseCommand):
                 # entirely; everything else falls through to the LLM.
                 action, reason = laya.decide(post.text)
                 if action == "spam":
+                    post.error_count = 0
                     post.update_state(2, reason)
                     r = oai.check_spam_permissions(post)
                 elif action == "visible":
+                    post.error_count = 0
                     post.update_state(1, reason)
                 else:
                     r = oai.judge_post(post)

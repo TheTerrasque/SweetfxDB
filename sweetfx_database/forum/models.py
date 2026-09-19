@@ -109,6 +109,10 @@ class ForumPost(models.Model):
         (5, "Verified spam"),
         (6, "Mistaken for spam")
     ], default=0)
+    # Number of LLM judgment errors (state 4) accumulated on this post.
+    # Incremented on each failed judgment, reset on a successful one.
+    # process_forum_spam stops retrying posts that reach the error cap.
+    error_count = models.PositiveSmallIntegerField(default=0)
 
     def text_short(self):
         return self.text[:200]
